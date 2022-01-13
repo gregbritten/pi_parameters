@@ -1,12 +1,10 @@
 rm(list=ls())
 
 library(rgdal)
-library(fields)
-library(viridis)
 
-d <- read_excel('~/google/WORKING/pi_parameters/data/PE_MAPP_2020_HAB_GKU_ADD-DATA_14062021.xlsx',col_types='numeric')
+source('r/functions.r')
 
-source('~/dropbox/code/functions/resize_bilinear().r')
+raw_dir <- '~/dropbox/data/ocean_productivity/'
 
 nlon <- 2160
 nlat <- 1080
@@ -16,18 +14,10 @@ lats <- seq(-90,90,length.out=nlat)
 
 lati <- which(lats >= 30  & lats <= 70)
 loni <- which(lons <= -30 & lons >=-80)
-#####################################################################################
-## PROCESS VARIABLES ################################################################
-#####################################################################################
-#variables: PAR, MLD, KD
 
-setwd('~/dropbox/data/ocean_productivity/par')
-#setwd('~/dropbox/data/ocean_productivity/mld')
-#setwd('~/dropbox/data/ocean_productivity/k490')
-
-par_files  <- list.files('~/dropbox/data/ocean_productivity/par',  full.names=TRUE)
-mld_files  <- list.files('~/dropbox/data/ocean_productivity/mld',  full.names=TRUE)
-kd_files   <- list.files('~/dropbox/data/ocean_productivity/k490', full.names=TRUE)
+par_files  <- list.files(paste0(raw_dir,'par'),  full.names=TRUE)
+mld_files  <- list.files(paste0(raw_dir,'mld'),  full.names=TRUE)
+kd_files   <- list.files(paste0(raw_dir,'k490'), full.names=TRUE)
 
 #Nfiles <- length(files)
 Nfiles <- 806
@@ -35,7 +25,7 @@ Nfiles <- 806
 #DAT  <- array(NA,dim=c(360*2,180*2,Nfiles))
 Iatl=PARatl=MLDatl=kdatl <- array(NA,dim=c(length(lons[loni]),length(lats[lati]),Nfiles))
 Iglb=PARglb=MLDglb=kdglb <- array(NA,dim=c(nlon/3,nlat/3,Nfiles))
-date <- numeric(Nfiles)
+date                     <- numeric(Nfiles)
 
 for(i in 1:Nfiles){
   print(i)

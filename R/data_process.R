@@ -1,5 +1,8 @@
+library(tidyverse)
 
-d <- read_excel('~/google/WORKING/pi_parameters/data/PE_MAPP_2020_HAB_GKU_ADD-DATA_14062021.xlsx',col_types='numeric')
+google_dir <- '~/google/WORKING/pi_parameters/'
+
+d <- read_csv(paste0(google_dir,'data/PE_MAPP_2020_HAB_GKU_ADD-DATA_14062021.csv'))
 
 load(file='~/dropbox/working/pi_parameters/PARglb.rdata')	
 load(file='~/dropbox/working/pi_parameters/MLDglb.rdata')	
