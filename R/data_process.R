@@ -1,24 +1,4 @@
-library(tidyverse)
-
-google_dir <- '~/google/WORKING/pi_parameters/'
-
-d <- read_csv(paste0(google_dir,'data/PE_MAPP_2020_HAB_GKU_ADD-DATA_14062021.csv'))
-
-load(file='~/dropbox/working/pi_parameters/PARglb.rdata')	
-load(file='~/dropbox/working/pi_parameters/MLDglb.rdata')	
-load(file='~/dropbox/working/pi_parameters/kdglb.rdata')	
-load(file='~/dropbox/working/pi_parameters/Iglb.rdata')	
-load(file='~/dropbox/working/pi_parameters/PARatl.rdata')	
-load(file='~/dropbox/working/pi_parameters/MLDatl.rdata')	
-load(file='~/dropbox/working/pi_parameters/kdatl.rdata')	
-load(file='~/dropbox/working/pi_parameters/Iatl.rdata')
-load(file='~/dropbox/working/pi_parameters/date.rdata')
-
-##--GLOBAL--############################
-d$NGROUP   <- cut_number(d$NITRATE,4,labels=c('1','2','3','4')) #create nitrate groups
-d$CHLGROUP <- cut_number(d$TCHL,4,labels=c('1','2','3','4')) #create nitrate groups
-
-d$Imld_clim=d$PAR_clim=d$MLD_clim=d$kd_clim=d$OPTDEPTH=d$PAR_depth_clim <- NA
+rm(list=ls())
 
 nlon <- 720
 nlat <- 360
@@ -26,24 +6,47 @@ nlat <- 360
 lons <- seq(-180,180,length.out=nlon)
 lats <- seq(-90,90,length.out=nlat)
 
+google_dir <- '~/google/WORKING/pi_parameters/'
+
+d <- read.csv(paste0(google_dir,'data/PE_MAPP_2020_HAB_GKU_ADD-DATA_14062021.csv'))
+d$DEPTH <- as.numeric(d$DEPTH)
+
+load('processed_data/PAR.rds')	
+load('processed_data/MLD.rds')	
+load('processed_data/KD.rds')	
+load('processed_data/I.rds')	
+load('processed_data/CHL_GIOP.rds')	
+load('processed_data/CHL_GSM.rds')	
+load('processed_data/BBP_GIOP.rds')	
+load('processed_data/BBP_GSM.rds')	
+load('processed_data/date.rds')	
+load('processed_data/time.rds')	
+
+d$PAR  = d$MLD  = d$KD  = d$I  = d$CHL_GIOP  = d$CHL_GSM  = d$BBP_GIOP  = d$BBP_GSM  = d$OPT  <- NA
+d$PARc = d$MLDc = d$KDc = d$Ic = d$CHL_GIOPc = d$CHL_GSMc = d$BBP_GIOPc = d$BBP_GSMc = d$OPTc <- NA
+
 for(i in 1:nrow(d)){
-print(i)
+  print(i)
   dd  <- d[i,]
   lat <- dd$LAT
   lon <- dd$LON
   mth <- dd$MONTH
   
-  d$Imld_clim[i] <- mean(Iglb[which.min((lon - lons)^2),   which.min((lat - lats)^2),month(date)==mth]) 
-  d$PAR_clim[i]  <- mean(PARglb[which.min((lon - lons)^2), which.min((lat - lats)^2),month(date)==mth]) 
-  d$MLD_clim[i]  <- mean(MLDglb[which.min((lon - lons)^2),   which.min((lat - lats)^2),month(date)==mth]) 
-  d$kd_clim[i]   <- mean(kdglb[which.min((lon - lons)^2),   which.min((lat - lats)^2),month(date)==mth]) 
-  d$OPTDEPTH[i]  <- d$DEPTH[i]*d$kd_clim[i]
-  d$PAR_depth_clim[i] <- d$PAR_clim[i]*exp(-d$kd_clim[i]*d$DEPTH[i])
+  d$IMLDc[i]     <- mean(I[which.min((lon - lons)^2),   which.min((lat - lats)^2),month(date)==mth]) 
+  d$PARc[i]      <- mean(PAR[which.min((lon - lons)^2), which.min((lat - lats)^2),month(date)==mth]) 
+  d$MLDc[i]      <- mean(MLD[which.min((lon - lons)^2),   which.min((lat - lats)^2),month(date)==mth]) 
+  d$KDc[i]       <- mean(KD[which.min((lon - lons)^2),   which.min((lat - lats)^2),month(date)==mth]) 
+  d$OPTDEPTHc[i] <- d$DEPTH[i]*d$KDc[i]
+  d$PARc_z[i]    <- d$PARc[i]*exp(-d$KDc[i]*d$DEPTH[i])
 }
 
+
+
+##--GROUPING--############################
+d$NGROUP   <- cut_number(d$NITRATE,4,labels=c('1','2','3','4')) #create nitrate groups
+d$CHLGROUP <- cut_number(d$TCHL,4,labels=c('1','2','3','4')) #create nitrate groups
 d$ODGROUP  <- cut_number(d$OPTDEPTH,4,labels=c('1','2','3','4')) #create nitrate groups
 d$PARGROUP <- cut_number(d$PAR_depth_clim,4,labels=c('1','2','3','4')) #create nitrate groups
-
 
 ##--NW ATLANTIC--##########################
 nwatl <- d[d$LAT > 35 & d$LAT < 70 & d$LON < -35 & d$LON >-80,]
