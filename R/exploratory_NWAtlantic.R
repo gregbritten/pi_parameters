@@ -4,19 +4,19 @@ library(car)
 rm(list=ls())
 
 ##--PROCESS DATA--################
-source('~/dropbox/working/pi_parameters/github/data_process.R')
+#source('~/dropbox/working/pi_parameters/github/R/data_process.R')
+nwatl <- read.csv('processed_data/nwatl.csv')
 
-plot(nwatl$DEPTH*nwatl$kd_clim,log10(nwatl$EK),col=nwatl$NGROUP)
-plot(nwatl$DEPTH*nwatl$kd_clim,log10(nwatl$EK),col=nwatl$CHLGROUP)
-
-
-pdf('~/google/working/pi_parameters/plots/north_atlantic_points.pdf',height=6,width=5)
-par(mfrow=c(1,1))
-maps::map(fill=TRUE,col='grey',xlim=c(-90,-20),ylim=c(25,80))
-points(nwatl$LON,nwatl$LAT,cex=0.2,col='red')
+##--MAP WITH OBSERVATIONS--#############################
+pdf('~/dropbox/working/pi_parameters/github/plots/north_atlantic_points.pdf',height=5.5,width=4.5)
+par(mfrow=c(1,1),mar=c(2,2,2,2),oma=c(2,2,2,2))
+maps::map(fill=TRUE,col='grey',xlim=c(-100,-20),ylim=c(30,80),resolution=0)
+points(nwatl$LON,nwatl$LAT,cex=0.2,col='red',pch=4,lwd=0.5)
+box()
 axis(side=1); axis(side=2)
+mtext(side=1,line=2.5,"Longitude")
+mtext(side=2,line=2.5,"Latitude")
 dev.off()
-
 
 ##--seasonal decomposition--###############
 seas <- list()
@@ -24,7 +24,6 @@ seas[['winter']] <- c(12,1,2)
 seas[['spring']] <- c(3,4,5)
 seas[['summer']] <- c(6,7,8)
 seas[['fall']]   <- c(9,10,11)
-
 
 ##--PLOT PARAMETERS VS LATITUDE BY SEASON--###########################
 order     <- findInterval(log10(nwatl$DEPTH), sort(log10(nwatl$DEPTH)))
@@ -130,10 +129,10 @@ dev.off()
 ###########################################################################
 dat <- nwatl[complete.cases(nwatl$TEMP),]
 
-dat$NGROUP   <- cut_number(dat$NITRATE,4,labels=c('1','2','3','4')) #create nitrate groups
-dat$CHLGROUP <- cut_number(dat$TCHL,4,labels=c('1','2','3','4')) #create nitrate groups
-dat$ODGROUP  <- cut_number(dat$OPTDEPTH,4,labels=c('1','2','3','4')) #create nitrate groups
-dat$PARGROUP <- cut_number(dat$PAR_depth_clim,4,labels=c('1','2','3','4')) #create nitrate groups
+dat$NGROUP   <- cut_number(dat$NITRATE,3,labels=c('1','2','3'))#,'4')) #create nitrate groups
+dat$CHLGROUP <- cut_number(dat$TCHL,3,labels=c('1','2','3'))#,'4')) #create nitrate groups
+dat$ODGROUP  <- cut_number(dat$OPTDEPTH,3,labels=c('1','2','3'))#,'4')) #create nitrate groups
+dat$PARGROUP <- cut_number(dat$PARc_z,3,labels=c('1','2','3'))#,'4')) #create nitrate groups
 
 NGROUPS   <- c(0.1,0.16,0.636,2.54,27.7)
 CHLGROUPS <- c(0.0332,0.56,1.21,2.81,105)
@@ -157,52 +156,54 @@ tT_max <- function(a,b,z,w) 2*a*exp(b*z + sqrt(b^2*w^2 + 1) - 1)*(sqrt(b^2*w^2 +
 ## TEMPERATURE AND CHLOROPHYLL GROUPS ##############################
 ####################################################################
 fits <- fitgroup <- function(dat,group){
-  if(group=='NGROUP'){dat1 <- dat[dat$NGROUP==1,]; dat2   <- dat[dat$NGROUP==2,]; dat3   <- dat[dat$NGROUP==3,];   dat4 <- dat[dat$NGROUP==4,]}
-  if(group=='CHLGROUP'){dat1 <- dat[dat$CHLGROUP==1,]; dat2 <- dat[dat$CHLGROUP==2,]; dat3 <- dat[dat$CHLGROUP==3,]; dat4 <- dat[dat$CHLGROUP==4,]}
-  if(group=='ODGROUP'){dat1 <- dat[dat$ODGROUP==1,]; dat2 <- dat[dat$ODGROUP==2,]; dat3 <- dat[dat$ODGROUP==3,]; dat4 <- dat[dat$ODGROUP==4,]}
-  if(group=='PARGROUP'){dat1 <- dat[dat$PARGROUP==1,]; dat2 <- dat[dat$PARGROUP==2,]; dat3 <- dat[dat$PARGROUP==3,]; dat4 <- dat[dat$PARGROUP==4,]}
+  if(group=='NGROUP'){dat1 <- dat[dat$NGROUP==1,]; dat2   <- dat[dat$NGROUP==2,]; dat3   <- dat[dat$NGROUP==3,]}#;   dat4 <- dat[dat$NGROUP==4,]}
+  if(group=='CHLGROUP'){dat1 <- dat[dat$CHLGROUP==1,]; dat2 <- dat[dat$CHLGROUP==2,]; dat3 <- dat[dat$CHLGROUP==3,]}#; dat4 <- dat[dat$CHLGROUP==4,]}
+  if(group=='ODGROUP'){dat1 <- dat[dat$ODGROUP==1,]; dat2 <- dat[dat$ODGROUP==2,]; dat3 <- dat[dat$ODGROUP==3,]}#; dat4 <- dat[dat$ODGROUP==4,]}
+  if(group=='PARGROUP'){dat1 <- dat[dat$PARGROUP==1,]; dat2 <- dat[dat$PARGROUP==2,]; dat3 <- dat[dat$PARGROUP==3,]}#; dat4 <- dat[dat$PARGROUP==4,]}
   
   fit1 <- nls(PMB ~ tT(TEMP,a,b,z,w), data=dat1, start=list(a=2.5,b=0.06,z=13,w=14),control=list(warnOnly=TRUE))
   fit2 <- nls(PMB ~ tT(TEMP,a,b,z,w), data=dat2, start=list(a=2.5,b=0.06,z=13,w=14),control=list(warnOnly=TRUE))
   fit3 <- nls(PMB ~ tT(TEMP,a,b,z,w), data=dat3, start=list(a=2.5,b=0.06,z=13,w=14),control=list(warnOnly=TRUE))
-  fit4 <- nls(PMB ~ tT(TEMP,a,b,z,w), data=dat4, start=list(a=2.5,b=0.06,z=8,w=14),control=list(warnOnly=TRUE))
+  #fit4 <- nls(PMB ~ tT(TEMP,a,b,z,w), data=dat4, start=list(a=2.5,b=0.06,z=8,w=14),control=list(warnOnly=TRUE))
   
   lines(seq(0,30,0.01),predict(fit1,newdata=list(TEMP=seq(0,30,0.01))),col=1)  
   lines(seq(0,30,0.01),predict(fit2,newdata=list(TEMP=seq(0,30,0.01))),col=2)  
   lines(seq(0,30,0.01),predict(fit3,newdata=list(TEMP=seq(0,30,0.01))),col=3)  
-  lines(seq(0,30,0.01),predict(fit4,newdata=list(TEMP=seq(0,30,0.01))),col=4) 
+  #lines(seq(0,30,0.01),predict(fit4,newdata=list(TEMP=seq(0,30,0.01))),col=4) 
   
-  fits <- list(fit1,fit2,fit3,fit4)
+  fits <- list(fit1,fit2,fit3)#,fit4)
   return(fits)
 }
 #dat1 <- dat[dat$NGROUP==1,]; dat2 <- dat[dat$NGROUP==2,]; dat3 <- dat[dat$NGROUP==3,]; 
 
 pdf('~/google/working/pi_parameters/plots/PMB_temperature_groups.pdf',height=6,width=12)
 par(mfrow=c(2,3),mar=c(2,2,2,4),oma=c(2,3,2,2))
-  plot(dat$TEMP, dat$PMB,cex=0.5)
+  plot(dat$TEMP, dat$PMB,cex=0.7,pch=20,ylim=c(0,15))
   fit  <- nls(PMB ~ tT(TEMP,a,b,z,w), data=dat, start=list(a=2.5,b=0.06,z=13,w=14))
   #fit  <- nls(PMB ~ tT(TEMP,a,bz,w), data=dat, start=list(z=13,w=14))
   lines(seq(0,30,0.01),predict(fit,newdata=list(TEMP=seq(0,30,0.01))),col='red')  
   lines(seq(0,30,0.01),tT_behren(seq(0,30,0.01)),col='blue')  
   legend(legend=c('Global Eppley-like', 'Behrenfeld & Falkowski'),'topleft',lty=1,col=c('red','blue'),bty='n')
   
-  plot(dat$TEMP, dat$PMB, col=dat$NGROUP,pch=1,cex=0.5)
+  plot(dat$TEMP, dat$PMB, col=dat$NGROUP,cex=0.7,pch=20,ylim=c(0,15))
+  
+  
   image.plot(legend.only=TRUE,matrix(log10(dat$NITRATE)),col=1:4,breaks=log10(NGROUPS))
   mtext('Grouped by nitrate')
   FITS_NGROUP <- fits(dat,'NGROUP')
 
-  plot(dat$TEMP, dat$PMB, col=dat$CHLGROUP,cex=0.5)
-  image.plot(legend.only=TRUE,matrix(log10(dat$TCHL)),col=1:4,breaks=log10(CHLGROUPS))
+  plot(dat$TEMP, dat$PMB, col=dat$CHLGROUP,cex=0.7,pch=20,ylim=c(0,15))
+  #image.plot(legend.only=TRUE,matrix(log10(dat$TCHL)),col=1:4,breaks=log10(CHLGROUPS))
   mtext('Grouped by chlorophyll')
   FITS_CHLGROUP <- fits(dat,'CHLGROUP')
 
-  plot(dat$TEMP, dat$PMB, col=dat$ODGROUP,cex=0.5)
-  image.plot(legend.only=TRUE,matrix(log10(dat$OPTDEPTH)),col=1:4,breaks=log10(ODGROUPS))
+  plot(dat$TEMP, dat$PMB, col=dat$ODGROUP,cex=0.7,pch=20,ylim=c(0,15))
+  #image.plot(legend.only=TRUE,matrix(log10(dat$OPTDEPTH)),col=1:4,breaks=log10(ODGROUPS))
   mtext('Grouped by optical depth')
   FITS_ODGROUP <- fits(dat,'ODGROUP')
 
-  plot(dat$TEMP, dat$PMB, col=dat$PARGROUP,cex=0.5)
-  image.plot(legend.only=TRUE,matrix(log10(dat$PAR_depth_clim)),col=1:4,breaks=log10(PARGROUPS))
+  plot(dat$TEMP, dat$PMB, col=dat$PARGROUP,cex=0.7,pch=20,ylim=c(0,15))
+  #image.plot(legend.only=TRUE,matrix(log10(dat$PAR_depth_clim)),col=1:4,breaks=log10(PARGROUPS))
   mtext('Grouped by PAR')
   FITS_PARGROUP <- fits(dat,'PARGROUP')
   

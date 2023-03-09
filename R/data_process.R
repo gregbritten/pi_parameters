@@ -1,3 +1,5 @@
+library(lubridate)
+
 rm(list=ls())
 
 nlon <- 720
@@ -8,8 +10,8 @@ lats <- seq(-90,90,length.out=nlat)
 
 google_dir <- '~/google/WORKING/pi_parameters/'
 
-d <- read.csv(paste0(google_dir,'data/PE_MAPP_2020_HAB_GKU_ADD-DATA_14062021.csv'))
-d$DEPTH <- as.numeric(d$DEPTH)
+d <- read.csv(paste0(google_dir,'data/PE_MAPP_2020_HAB_GKU_ADD-DATA_14062021.csv'),stringsAsFactors=FALSE) %>% 
+  mutate_all(function(x) as.numeric(as.character(x)))
 
 load('processed_data/PAR.rds')	
 load('processed_data/MLD.rds')	
@@ -49,13 +51,22 @@ d$ODGROUP  <- cut_number(d$OPTDEPTH,4,labels=c('1','2','3','4')) #create nitrate
 d$PARGROUP <- cut_number(d$PAR_depth_clim,4,labels=c('1','2','3','4')) #create nitrate groups
 
 ##--NW ATLANTIC--##########################
-nwatl <- d[d$LAT > 35 & d$LAT < 70 & d$LON < -35 & d$LON >-80,]
+#nwatl <- d[d$LAT > 35 & d$LAT < 70 & d$LON < -35 & d$LON >-80,]
+nwatl <- d %>% filter(LAT>30 & LAT<80 & LON < -30 & LON > -90) 
 nwatl <- nwatl[nwatl$NITRATE>-0.00001,]
 
 nwatl$NGROUP   <- cut_number(nwatl$NITRATE,4,labels=c('1','2','3','4')) #create nitrate groups
 nwatl$CHLGROUP <- cut_number(nwatl$TCHL,4,labels=c('1','2','3','4')) #create nitrate groups
 nwatl$ODGROUP  <- cut_number(nwatl$OPTDEPTH,4,labels=c('1','2','3','4')) #create nitrate groups
 nwatl$PARGROUP <- cut_number(nwatl$PAR_depth_clim,4,labels=c('1','2','3','4')) #create nitrate groups
+
+nwatl$NGROUP   <- cut_number(nwatl$NITRATE,2,labels=c('1','2')) #create nitrate groups
+nwatl$CHLGROUP <- cut_number(nwatl$TCHL,2,labels=c('1','2')) #create nitrate groups
+nwatl$ODGROUP  <- cut_number(nwatl$OPTDEPTH,2,labels=c('1','2')) #create nitrate groups
+nwatl$PARGROUP <- cut_number(nwatl$PARc_z,2,labels=c('1','2')) #create nitrate groups
+
+
+write.csv(nwatl,file='processed_data/nwatl.csv')
 
 
 # This section is intended to give nwatl PAR, MLD, kd, I at higher resolution
