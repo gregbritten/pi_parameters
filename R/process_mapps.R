@@ -3,9 +3,11 @@ library(hdf5r)
 library(anytime)
 library(tidyverse)
 
+setwd("~/dropbox/working/pi_parameters/mapps_forest/") #github repo
+
 #file names
-file_daily   <- H5File$new("~/dropbox/working/pi_parameters/mapps_forest/indata/mapps_daily_sat.h5", mode="r+")
-file_monthly <- H5File$new("~/dropbox/working/pi_parameters/mapps_forest/indata/mapps_monthly_sat.h5", mode="r+")
+file_daily   <- H5File$new("indata/mapps_daily_sat.h5", mode="r+")
+file_monthly <- H5File$new("indata/mapps_monthly_sat.h5", mode="r+")
 
 #extractor functions
 make_dat_daily <- function(file){
@@ -30,6 +32,6 @@ d_day   <- make_dat_daily(file_daily)
 d_month <- make_dat_monthly(file_monthly)
 
 #make nwatlantic dataframes
-nwa_day   <- d_day   %>% filter(lat>30 & lat<80 & lon < -30 & lon > -90) 
-nwa_month <- d_month %>% filter(lat>30 & lat<80 & lon < -30 & lon > -90) 
+nwa_d   <- d_day   %>% filter(lat>30 & lat<80 & lon < -30 & lon > -90) 
+nwa_m   <- d_month %>% filter(lat>30 & lat<80 & lon < -30 & lon > -90) 
 
