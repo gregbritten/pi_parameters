@@ -1,95 +1,57 @@
 library(mgcv)
 library(randomForest)
+library(doParallel)
+ncores <- detectCores()      
+registerDoParallel(ncores-1) #leave one core for other tasks
 
-##--data processing--###########
-dd <- nwa_d %>% filter(complete.cases(sst) & complete.cases(chl) & complete.cases(kd_490) & complete.cases(E_surf))
+source('r/process_csvs.r') ##--data processing--###########
 
-samp <- sample(1:nrow(dd),size=nrow(dd)/2)
-dd_train <- dd[samp,]
-dd_test  <- dd[-samp,]
+regions <- c('scot','lab','spac','tas','ice')
 
-dm <- nwa_m %>% filter(complete.cases(sst) & complete.cases(chl) & complete.cases(kd_490) & complete.cases(E_surf))
-samp <- sample(1:nrow(dm),size=nrow(dm)/2)
-dm_train <- dm[samp,]
-dm_test  <- dm[-samp,]
+fits=fits_chl <- list()
+
+for(j in 1:length(regions)){
+  fits[[j]] <- lapply(1:30,function(i){
+    d     <- D[[i]] %>% filter(region==regions[j],complete.cases(sst,par,lat,lon,depth,month,daylength))
+    randomForest(Ek ~ sst + par + lat + lon + depth + month + daylength, 
+                 data=d, importance=TRUE)
+  })
+  fits_chl[[j]] <- lapply(1:30,function(i){
+    d     <- D[[i]] %>% filter(region==regions[j],complete.cases(chl,kd_490,sst,par,lat,lon,depth,month,daylength))
+    randomForest(Ek ~ chl + kd_490 + sst + par + lat + lon + depth + month + daylength, 
+                 data=d, importance=TRUE)
+  })
+}
+
+cols <- brewer.pal(7,'Dark2')
+lets <- c('a)','b)','c)','d)','e)')
+nms <- numeric(5)
+ylims=c(1200,2000,4000,1000,500)
+for(i in 1:5) nms[i] <- paste(lets[i],region_long[i])
 
 
-##--PBMAX--################################  
-#fit_rf_d_pbm  <- randomForest(PBmax ~ sst + chl + kd_490 + E_surf + month + Ez + daylength + longhurst + region + sat_par + Zeu, data=dd_train)
-#fit_rf_m_pbm  <- randomForest(PBmax ~ sst + chl + kd_490 + E_surf + month + Ez + daylength + longhurst + region + sat_par + Zeu, data=dm_train)
-fit_rf_d_pbm  <- randomForest(PBmax ~ sst + chl + kd_490 + E_surf + month + Ez + daylength + sat_par + Zeu, data=dd_train)
-fit_rf_m_pbm  <- randomForest(PBmax ~ sst + chl + kd_490 + E_surf + month + Ez + daylength + sat_par + Zeu, data=dm_train)
+plot_rfs <- function(chl=FALSE){
+par(mfrow=c(2,3),mar=c(2,2,2,2),oma=c(3,3,2,2))
+for(j in 1:5){
+  plot(-999,xlim=c(0,30),ylim=c(0,ylims[j]))
+  mtext(nms[j],adj=0)  
+  for(p in 1:7){
+    lines(unlist(lapply(1:30,function(i){
+    if(chl==FALSE) imp <- fits[[j]][[i]]$importance[,1]
+    if(chl==TRUE) imp <- fits_chl[[j]][[i]]$importance[,1]
+    imp[p]
+})),col=cols[p])
+  }
+  #plot(-999,xlim=c(0,30),ylim=c(-0.05,0.6))
+  if(j==1) legend('topleft',legend=c('sst','par','lat','lon','depth','month','daylength'), lty=1, col=cols,bty='n',cex=0.8)
+}
+mtext(outer=TRUE,side=1,'Averaging Timescale [days]',line=1)    
+mtext(outer=TRUE,side=2,'Relative Variable Importance [normalized %MSE increase]',line=1)    
+}
 
-pdf('~/dropbox/working/pi_parameters/github/plots/PBmax_rf.pdf',height=5,width=5)
-par(mfrow=c(2,2),mar=c(2,2,2,2),oma=c(4,2,2,2))
-lims <- c(0,10)
-plot(dd_test$PBmax,as.numeric(predict(fit_rf_d_pbm,newdata=dd_test)),xlim=lims,ylim=lims)
-abline(0,1); mtext(paste0('cor = ',paste(round(cor(dd_test$PBmax,as.numeric(predict(fit_rf_d_pbm,newdata=dd_test))),3))))
-mtext(side=1,line=2.5,'Observed'); mtext(side=2,line=2.5,'Predicted') 
-plot(dm_test$PBmax,as.numeric(predict(fit_rf_m_pbm,newdata=dm_test)),xlim=lims,ylim=lims)
-abline(0,1); mtext(paste0('cor = ',paste(round(cor(dm_test$PBmax,as.numeric(predict(fit_rf_m,newdata=dm_test))),3))))
-mtext(side=1,line=2.5,'Observed')
+plot_rfs(chl=FALSE)
+plot_rfs(chl=TRUE)
 
-barplot(t(fit_rf_d_pbm$importance)/sum(fit_rf_d_pbm$importance),ylim=c(0,0.4),las=2)
-mtext(side=2,line=2.5,'Variable importance')
-barplot(t(fit_rf_m_pbm$importance)/sum(fit_rf_m_pbm$importance),ylim=c(0,0.4),las=2)
-mtext(outer=TRUE,expression('P'['M']^'B'))
-dev.off()
+##--DO GLOBAL--##############################
+d_global <- D[[i]] %>% filter(region==regions[j],complete.cases(sst,par,lat,lon,depth,month,daylength))
 
-##--ALPHA--##################################
-#fit_rf_d_alpha  <- randomForest(alpha ~ sst + chl + kd_490 + E_surf + month + Ez + daylength + longhurst + region + sat_par + Zeu, data=dd_train)
-#fit_rf_m_alpha  <- randomForest(alpha ~ sst + chl + kd_490 + E_surf + month + Ez + daylength + longhurst + region + sat_par + Zeu, data=dm_train)
-fit_rf_d_alpha  <- randomForest(alpha ~ sst + chl + kd_490 + E_surf + month + Ez + daylength + sat_par + Zeu, data=dd_train)
-fit_rf_m_alpha  <- randomForest(alpha ~ sst + chl + kd_490 + E_surf + month + Ez + daylength + sat_par + Zeu, data=dm_train)
-
-#lims <- c(50,200)
-lims <- c(0,0.1)
-pdf('~/dropbox/working/pi_parameters/github/plots/alpha_rf.pdf',height=5,width=5)
-par(mfrow=c(2,2),mar=c(2,2,2,2),oma=c(4,2,2,2))
-#plot(dd_test$PBmax,as.numeric(predict(fit_gam_d,newdata=dd_test)),ylim=lims,xlim=lims)
-#  abline(0,1); mtext(paste(round(cor(dd_test$PBmax,as.numeric(predict(fit_gam_d,newdata=dd_test))),3)))
-plot(dd_test$alpha,as.numeric(predict(fit_rf_d_alpha,newdata=dd_test)),xlim=lims,ylim=lims)
-abline(0,1); mtext(paste0('cor = ',paste(round(cor(dd_test$alpha,as.numeric(predict(fit_rf_d_alpha,newdata=dd_test))),3))))
-mtext(side=1,line=2.5,'Observed'); mtext(side=2,line=2.5,'Predicted') 
-plot(dm_test$alpha,as.numeric(predict(fit_rf_m_alpha,newdata=dm_test)),xlim=lims,ylim=lims)
-abline(0,1); mtext(paste0('cor = ',paste(round(cor(dm_test$alpha,as.numeric(predict(fit_rf_m_alpha,newdata=dm_test))),3))))
-mtext(side=1,line=2.5,'Observed')
-
-barplot(t(fit_rf_d_alpha$importance)/sum(fit_rf_d_alpha$importance),ylim=c(0,0.4),las=2)
-mtext(side=2,line=2.5,'Variable importance')
-barplot(t(fit_rf_m_alpha$importance)/sum(fit_rf_m_alpha$importance),ylim=c(0,0.4),las=2)
-mtext(outer=TRUE,expression(alpha['M']^'B'))
-dev.off()
-
-##--Ek--##################################
-#fit_rf_d_ek  <- randomForest(Ek ~ sst + chl + kd_490 + E_surf + month + Ez + daylength + longhurst + region + sat_par + Zeu, data=dd_train)
-#fit_rf_m_ek  <- randomForest(Ek ~ sst + chl + kd_490 + E_surf + month + Ez + daylength + longhurst + region + sat_par + Zeu, data=dm_train)
-#fit_rf_d_ek  <- randomForest(Ek ~ sst + chl + kd_490 + E_surf + month + Ez + daylength + sat_par + Zeu, data=dd_train)
-#fit_rf_m_ek  <- randomForest(Ek ~ sst + chl + kd_490 + E_surf + month + Ez + daylength + sat_par + Zeu, data=dm_train)
-
-#lims <- c(50,200)
-#lims <- c(25,200)
-#par(mfrow=c(2,2),mar=c(2,2,1,1))
-#plot(dd_test$PBmax,as.numeric(predict(fit_gam_d,newdata=dd_test)),ylim=lims,xlim=lims)
-#  abline(0,1); mtext(paste(round(cor(dd_test$PBmax,as.numeric(predict(fit_gam_d,newdata=dd_test))),3)))
-#plot(dd_test$Ek,as.numeric(predict(fit_rf_d_ek,newdata=dd_test)),xlim=lims,ylim=lims)
-#abline(0,1); mtext(paste(round(cor(dd_test$Ek,as.numeric(predict(fit_rf_d_ek,newdata=dd_test))),3)))
-
-#plot(dm_test$Ek,as.numeric(predict(fit_rf_m_ek,newdata=dm_test)),xlim=lims,ylim=lims)
-#abline(0,1); mtext(paste(round(cor(dm_test$Ek,as.numeric(predict(fit_rf_m_ek,newdata=dm_test))),3)))
-
-#barplot(t(fit_rf_d_ek$importance)/sum(fit_rf_d_ek$importance),ylim=c(0,0.4),las=2)
-#barplot(t(fit_rf_m_ek$importance)/sum(fit_rf_m_ek$importance),ylim=c(0,0.4))
-
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
