@@ -1,106 +1,53 @@
-library(mgcv)
+#library(mgcv)
 library(randomForest)
-library(doParallel)
-ncores <- detectCores()      
-registerDoParallel(ncores-1) #leave one core for other tasks
+library(viridis)
+#library(doParallel)
+#ncores <- detectCores()      
+#registerDoParallel(ncores-1) #leave one core for other tasks
 
-source('r/process_csvs.r') ##--data processing--###########
+source('r/fit_rf.r') ##--data processing--###########
+source('r/plot_rf_importance.r') ##--data processing--###########
+source('r/plot_rf_rsq.r') ##--data processing--###########
 
-regions <- c('scot','lab','spac','tas','ice')
+regions     <- c('scot','lab','spac','tas','ice')
+region_long <- c('Scotian Shelf','Labrador Sea','South Pacific','Southern Ocean','Iceland Shelf','Global')
 
-fits=fits_chl <- list()
+##--Fit models--###################
 
-for(j in 1:length(regions)){
-  fits[[j]] <- lapply(1:30,function(i){
-    d     <- D[[i]] %>% filter(region==regions[j],complete.cases(sst,par,lat,lon,depth,month,daylength))
-    list(randomForest(Ek ~ sst + par + lat + lon + depth + month + daylength, 
-                 data=d, importance=TRUE), d)
-  })
-  fits_chl[[j]] <- lapply(1:30,function(i){
-    d     <- D[[i]] %>% filter(region==regions[j],complete.cases(chl,kd_490,sst,par,lat,lon,depth,month,daylength))
-    list(randomForest(Ek ~ chl + kd_490 + sst + par + lat + lon + depth + month + daylength, 
-                 data=d, importance=TRUE), d)
-  })
-}
-
-
-
-
-plot_rf_importance <- function(chl=FALSE){
-par(mfrow=c(2,3),mar=c(2,2,2,2),oma=c(3,3,2,2))
-for(j in 1:5){
-  plot(-999,xlim=c(0,30),ylim=c(0,ylims[j]))
-  mtext(nms[j],adj=0)
-  if(chl==FALSE){
-    for(p in 1:7){
-      lines(unlist(lapply(1:30,function(i){
-        imp <- fits[[j]][[i]][[1]]$importance[,1]
-        imp[p]
-      })),col=cols[p])}}
-  if(chl==TRUE){
-    for(p in 1:9){
-      lines(unlist(lapply(1:30,function(i){
-        imp <- fits_chl[[j]][[i]][[1]]$importance[,1]
-        imp[p]
-      })),col=cols[p])}}
-  #plot(-999,xlim=c(0,30),ylim=c(-0.05,0.6))
-  if(j==1 & chl==FALSE) legend('topleft',legend=c('sst','par','lat','lon','depth','month','daylength'), lty=1, col=cols,bty='n',cex=0.8)
-  if(j==1 & chl==TRUE) legend('topleft',legend=c('chl','kd_490','sst','par','lat','lon','depth','month','daylength'), lty=1, col=cols,bty='n',cex=0.8)
-}
-mtext(outer=TRUE,side=1,'Averaging Timescale [days]',line=1)    
-mtext(outer=TRUE,side=2,'Relative Variable Importance [normalized %MSE increase]',line=1)    
-}
-
+##--Make plot--####################
 #Plot setup
 cols <- turbo(9)
-lets <- c('a)','b)','c)','d)','e)')
-nms <- numeric(5)
-for(i in 1:5) nms[i] <- paste(lets[i],region_long[i])
-ylims=c(1200,2000,4000,1000,500)
+lets <- c('a)','b)','c)','d)','e)','f)')
+nms <- numeric(6)
+for(i in 1:6) nms[i] <- paste(lets[i],region_long[i])
 
-#Make plot
-plot_rf_importance(chl=FALSE)
-plot_rf_importance(chl=TRUE)
+ylims=c(1000,1000,4000,1000,150)
+par(mfrow=c(2,3),mar=c(2,2,2,2),oma=c(3,3,2,2))
+plot_rf_importance(fits=fits_Ek_chl,chl=TRUE)
+plot(-999,xaxt='n',yaxt='n',xlim=c(0,1),ylim=c(0,1),bty='n')
+legend('topleft',legend=c('chl','kd_490','sst','par','lat','lon','depth','month','daylength'), 
+       lty=1, col=cols,bty='n',cex=1.2)
 
+ylims=c(2.2,0.5,0.5,2,0.5)
+par(mfrow=c(2,3),mar=c(2,2,2,2),oma=c(3,3,2,2))
+plot_rf_importance(fits=fits_PBmax_chl,chl=TRUE)
+plot(-999,xaxt='n',yaxt='n',xlim=c(0,1),ylim=c(0,1),bty='n')
+legend('topleft',legend=c('chl','kd_490','sst','par','lat','lon','depth','month','daylength'), 
+       lty=1, col=cols,bty='n',cex=1.2)
 
-###################################################################################
-###################################################################################
+ylims=c(0.0003,0.0001,0.0005,0.0006,0.0002)
+par(mfrow=c(2,3),mar=c(2,2,2,2),oma=c(3,3,2,2))
+plot_rf_importance(fits=fits_alpha_chl,chl=TRUE)
+plot(-999,xaxt='n',yaxt='n',xlim=c(0,1),ylim=c(0,1),bty='n')
+legend('topleft',legend=c('chl','kd_490','sst','par','lat','lon','depth','month','daylength'), 
+       lty=1, col=cols,bty='n',cex=1.2)
 
-plot_rf_rq <- function(chl=FALSE){
-  par(mfrow=c(1,2),mar=c(2,2,2,2),oma=c(3,3,2,2))
-  plot(-999,xlim=c(0,30),ylim=c(0,1))
-  for(j in 1:5){
-    #mtext(nms[j],adj=0)
-      lines(unlist(lapply(1:30,function(i){
-        if(chl==FALSE) imp <- cor(predict(fits[[j]][[i]][[1]]),fits[[j]][[i]][[2]]$Ek)^2
-        if(chl==TRUE) imp <- cor(predict(fits_chl[[j]][[i]][[1]]),fits_chl[[j]][[i]][[2]]$Ek)^2
-        imp
-      })),col=cols[j])
-  }
-  mtext(side=2,expression('R'^2),line=2.5)    
-  plot(-999,xlim=c(0,30),ylim=c(10,sqrt(5000)))
-  for(j in 1:5){
-    #mtext(nms[j],adj=0)
-    lines(unlist(lapply(1:30,function(i){
-      if(chl==FALSE) imp <- sqrt(mean((predict(fits[[j]][[i]][[1]])-fits[[j]][[i]][[2]]$Ek)^2))
-      if(chl==TRUE) imp <- sqrt(mean((predict(fits_chl[[j]][[i]][[1]])-fits_chl[[j]][[i]][[2]]$Ek)^2))
-      imp
-    })),col=cols[j])
-  }
-  #plot(-999,xlim=c(0,30),ylim=c(-0.05,0.6))
-  mtext(side=2,expression('RMSE'),line=2.5)    
-  legend('topright',legend=region_long, lty=1, col=cols,bty='n',cex=0.8)
-  mtext(outer=TRUE,side=1,'Averaging Timescale [days]',line=1)    
-}
 
 cols <- turbo(6)
-pdf('plots/rq_timescale.pdf',height=4,width=4)
-plot_rf_rq(chl=FALSE)
-plot_rf_rq(chl=TRUE)
+pdf('plots/rq_timescale.pdf',height=7.5,width=5.5)
+par(mfrow=c(3,2),mar=c(2,2,2,2),oma=c(3,3,2,2))
+plot_rf_rsq(fits_Ek_chl,parm='Ek',ylim_rmse=c(10,70),legend=TRUE,text=expression(italic('E'['k'])))
+plot_rf_rsq(fits_PBmax_chl, parm='PBmax',ylim_rmse=c(0.5,1.5),text=expression(italic('P'['max']^{'B'})))
+plot_rf_rsq(fits_alpha_chl,parm='alpha',ylim_rmse=c(0.005,0.025),text=expression(italic(alpha^{'B'})))
 dev.off()
-
-###################################################################################
-##--ADD GLOBAL TO PLTOS?
-###################################################################################
-d_global <- D[[i]] %>% filter(region==regions[j],complete.cases(sst,par,lat,lon,depth,month,daylength))
 
