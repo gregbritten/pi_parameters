@@ -1,6 +1,6 @@
-plot_rf_rsq <- function(fits,chl,parm,ylim_rmse,legend=FALSE,text){
+plot_rf_rsq <- function(fits,chl,parm,ylim_rmse,ylim_r2,legend=FALSE,text){
   #par(mfrow=c(1,2),mar=c(2,2,2,2),oma=c(3,3,2,2))
-  plot(-999,xlim=c(0,30),ylim=c(0,1))
+  plot(-999,xlim=c(0,30),ylim=c(ylim_r2[1],ylim_r2[2]))
   for(j in 1:5){
     #mtext(nms[j],adj=0)
     lines(unlist(lapply(1:30,function(i){

@@ -1,3 +1,4 @@
+source('r/process_csvs.r') ##--data processing--###########
 
 i=1
 par(mfrow=c(2,3))

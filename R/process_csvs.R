@@ -24,3 +24,16 @@ for(i in 1:length(mean_files)){
                                                                    ifelse(lat>= 58 & lat<72 & lon> -35 & lon< 0,'ice',NA))))))
 }
 
+
+#C <- list()
+#for(i in 1:length(count_files)){
+#  C[[i]] <- read.csv(count_files[i])
+#  D[[i]]$region <- NA
+#  D[[i]] <- D[[i]] %>% mutate(region = ifelse(lat> -40 & lat<0 & lon> -150 & lon< -70,'spac',
+#                                              ifelse(lat> -60 & lat< -40 & lon< 160 & lon>130,'tas',
+#                                                     ifelse(lat> 30 & lat<50 & lon> -70 & lon< -40,'scot',
+#                                                            ifelse(lat>= 50 & lat<65 & lon> -60 & lon< -40,'lab',
+#                                                                   ifelse(lat>= 58 & lat<72 & lon> -35 & lon< 0,'ice',NA))))))
+#}
+
+
