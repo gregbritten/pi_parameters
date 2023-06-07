@@ -1,5 +1,6 @@
 source('r/process_csvs.r') ##--data processing--###########
 
+regions <- c('scot','lab','spac','tas','ice')
 vars <- c('par','sst','chl','kd_490')
 ylims <- list(c(-40,40),c(-5,5),c(-3,3),c(-0.2,0.2))
 var_long <- c(expression(Delta*'PAR'),expression(Delta*'SST'),expression(Delta*'Chl'),expression(Delta*'Kd'['490']))
