@@ -10,6 +10,7 @@ plot_rf_rsq <- function(fits,chl,parm,ylim_rmse,ylim_r2,legend=FALSE,text,outer=
       imp
     }))
     lines(-29:0,xx[30:1],col=cols[j])
+    abline(v={-29:0}[xx[30:1]==max(xx[30:1])],lty=3,col=cols[j])
     #abline(h=xx[30],lty=2,col=cols[j])
   }
   mtext(side=2,expression('R'^2),line=2)
@@ -17,12 +18,14 @@ plot_rf_rsq <- function(fits,chl,parm,ylim_rmse,ylim_r2,legend=FALSE,text,outer=
   plot(-999,xlim=c(-30,0),ylim=c(ylim_rmse[1],ylim_rmse[2]))
   for(j in 1:5){
     #mtext(nms[j],adj=0)
-    lines(-29:0,unlist(lapply(1:30,function(i){
+      xx <- unlist(lapply(1:30,function(i){
       if(parm=='Ek') imp <- sqrt(mean((predict(fits[[j]][[i]][[1]])-fits[[j]][[i]][[2]]$Ek)^2))
       if(parm=='alpha') imp <- sqrt(mean((predict(fits[[j]][[i]][[1]])-fits[[j]][[i]][[2]]$alpha)^2))
       if(parm=='PBmax') imp <- sqrt(mean((predict(fits[[j]][[i]][[1]])-fits[[j]][[i]][[2]]$PBmax)^2))
       imp
-    }))[30:1],col=cols[j])
+    }))
+    lines(-29:0,xx[30:1],col=cols[j])
+    abline(v={-29:0}[xx[30:1]==min(xx[30:1])],lty=3,col=cols[j])
   }
   #plot(-999,xlim=c(0,30),ylim=c(-0.05,0.6))
   mtext(side=2,expression('RMSE'),line=2)    

@@ -1,13 +1,15 @@
 library(viridis)
+library(randomForest)
 
 source('r/plot_rf_rsq.r') ##
 
+region_long <- c('Scotian Shelf','Labrador Sea','South Pacific','Southern Ocean','Iceland Shelf')
 ##--Load fitted random forests--###########
-fits_Ek_chl_T  <- readRDS('results/fits_Ek_chl_T.rds')
-fits_PBmax_chl <- readRDS('results/fits_PBmax_chl_T.rds')
-fits_alpha_chl <- readRDS('results/fits_alpha_chl_T.rds')
+fits_Ek_chl_T    <- readRDS('results/fits_Ek_chl_T.rds')
+fits_PBmax_chl_T <- readRDS('results/fits_PBmax_chl_T.rds')
+fits_alpha_chl_T <- readRDS('results/fits_alpha_chl_T.rds')
 
-pdf('plots/rq_timescale_full_true.pdf',height=6.5,width=7.5)
+pdf('plots/rq_timescale_full_true.pdf',height=6,width=7.5)
 cols <- turbo(5)
 par(mfrow=c(3,3),mar=c(2,2,2,2),oma=c(3,3,2,2),cex.axis=0.8)
   plot_rf_rsq(fits_PBmax_chl_T, parm='PBmax',ylim_rmse=c(0.5,1.5),ylim_r2=c(0,1),text=expression(italic('P'['max']^{'B'})),outer=TRUE)
