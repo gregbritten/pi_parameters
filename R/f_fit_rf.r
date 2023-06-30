@@ -1,7 +1,7 @@
-fit_rf <- function(parm,chl,full){
+fit_rf <- function(parm,chl,full,ntime){
   fits <- list()
   for(j in 1:length(regions)){
-    fits[[j]] <- lapply(1:30,function(i){
+    fits[[j]] <- lapply(1:ntime,function(i){
       
       if(full==TRUE){
       if(chl==FALSE){
@@ -36,7 +36,7 @@ fit_rf <- function(parm,chl,full){
       list(fit,d)
     })
   }
-  fits[[length(regions)+1]] <- lapply(1:30,function(i){
+  fits[[length(regions)+1]] <- lapply(1:90,function(i){
     if(full==TRUE){
     if(chl==FALSE){
       d     <- D[[i]] %>% filter(region%in%regions,complete.cases(sst,par,lat,lon,depth,month,daylength))
