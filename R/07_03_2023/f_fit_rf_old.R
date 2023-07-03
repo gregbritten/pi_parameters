@@ -4,17 +4,33 @@ fit_rf <- function(D,parm,chl,full,ntime){
     fits[[j]] <- lapply(1:ntime,function(i){
       
       if(full==TRUE){
+      if(chl==FALSE){
+        d     <- D[[i]] %>% filter(region==regions[j],complete.cases(sst,par,lat,lon,depth,month,daylength))
+        if(parm=='Ek')    fit <- randomForest(Ek    ~ sst + par + lat + lon + depth + month + day, data=d, importance=TRUE) 
+        if(parm=='alpha') fit <- randomForest(alpha ~ sst + par + lat + lon + depth + month + daylength, data=d, importance=TRUE) 
+        if(parm=='PBmax') fit <- randomForest(PBmax ~ sst + par + lat + lon + depth + month + daylength, data=d, importance=TRUE) 
+      }
+      if(chl==TRUE){
         d     <- D[[i]] %>% filter(region==regions[j],complete.cases(chl,sst,par,lat,lon,depth,month,daylength))
         if(parm=='Ek')    fit <- randomForest(Ek    ~ chl + sst + par + lat + lon + depth + month + daylength, data=d, importance=TRUE) 
         if(parm=='alpha') fit <- randomForest(alpha ~ chl + sst + par + lat + lon + depth + month + daylength, data=d, importance=TRUE) 
         if(parm=='PBmax') fit <- randomForest(PBmax ~ chl + sst + par + lat + lon + depth + month + daylength, data=d, importance=TRUE) 
       }
+      }
       
       if(full==FALSE){
+      if(chl==FALSE){
+        d     <- D[[i]] %>% filter(region==regions[j],complete.cases(sst,par,lat,lon,depth,month,daylength))
+        if(parm=='Ek')    fit <- randomForest(Ek    ~ sst + par + lat + lon + depth, data=d, importance=TRUE) 
+        if(parm=='alpha') fit <- randomForest(alpha ~ sst + par + lat + lon + depth, data=d, importance=TRUE) 
+        if(parm=='PBmax') fit <- randomForest(PBmax ~ sst + par + lat + lon + depth, data=d, importance=TRUE) 
+      }
+      if(chl==TRUE){
         d     <- D[[i]] %>% filter(region==regions[j],complete.cases(chl,sst,par,lat,lon,depth,month,daylength))
         if(parm=='Ek')    fit <- randomForest(Ek    ~ chl + sst + par + lat + lon + depth, data=d, importance=TRUE) 
         if(parm=='alpha') fit <- randomForest(alpha ~ chl + sst + par + lat + lon + depth, data=d, importance=TRUE) 
         if(parm=='PBmax') fit <- randomForest(PBmax ~ chl + sst + par + lat + lon + depth, data=d, importance=TRUE) 
+      }
       }
       
       list(fit,d)
@@ -22,17 +38,33 @@ fit_rf <- function(D,parm,chl,full,ntime){
   }
   fits[[length(regions)+1]] <- lapply(1:ntime,function(i){
     if(full==TRUE){
+    if(chl==FALSE){
+      d     <- D[[i]] %>% filter(region%in%regions,complete.cases(sst,par,lat,lon,depth,month,daylength))
+      if(parm=='Ek')    fit <- randomForest(Ek    ~ sst + par + lat + lon + depth + month + daylength, data=d, importance=TRUE) 
+      if(parm=='alpha') fit <- randomForest(alpha ~ sst + par + lat + lon + depth + month + daylength, data=d, importance=TRUE) 
+      if(parm=='PBmax') fit <- randomForest(PBmax ~ sst + par + lat + lon + depth + month + daylength, data=d, importance=TRUE) 
+    }  
+    if(chl==TRUE){
       d     <- D[[i]] %>% filter(region%in%regions,complete.cases(chl,sst,par,lat,lon,depth,month,daylength))
       if(parm=='Ek')    fit <- randomForest(Ek    ~ chl + sst + par + lat + lon + depth + month + daylength, data=d, importance=TRUE) 
       if(parm=='alpha') fit <- randomForest(alpha ~ chl + sst + par + lat + lon + depth + month + daylength, data=d, importance=TRUE)
       if(parm=='PBmax') fit <- randomForest(PBmax ~ chl + sst + par + lat + lon + depth + month + daylength, data=d, importance=TRUE)    
     }
-
+    }
+    
     if(full==FALSE){
+    if(chl==FALSE){
+      d     <- D[[i]] %>% filter(region%in%regions,complete.cases(sst,par,lat,lon,depth,month,daylength))
+      if(parm=='Ek')    fit <- randomForest(Ek    ~ sst + par + lat + lon + depth, data=d, importance=TRUE) 
+      if(parm=='alpha') fit <- randomForest(alpha ~ sst + par + lat + lon + depth, data=d, importance=TRUE) 
+      if(parm=='PBmax') fit <- randomForest(PBmax ~ sst + par + lat + lon + depth, data=d, importance=TRUE) 
+    }  
+    if(chl==TRUE){
       d     <- D[[i]] %>% filter(region%in%regions,complete.cases(chl,sst,par,lat,lon,depth,month,daylength))
       if(parm=='Ek')    fit <- randomForest(Ek    ~ chl + sst + par + lat + lon + depth, data=d, importance=TRUE) 
       if(parm=='alpha') fit <- randomForest(alpha ~ chl + sst + par + lat + lon + depth, data=d, importance=TRUE)
       if(parm=='PBmax') fit <- randomForest(PBmax ~ chl + sst + par + lat + lon + depth, data=d, importance=TRUE)    
+    }
     }
     list(fit,d)
   })

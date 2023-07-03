@@ -46,14 +46,14 @@ sst2 <- sstnc[,keep]
 par2 <- parnc[,keep]
 chl2 <- chlnc[,keep]
 
-D <- list()
-D[[1]] <- data.frame(sst=sst2[1,],chl=chl2[1,],par=par2[1,],
+D_nc <- list()
+D_nc[[1]] <- data.frame(sst=sst2[1,],chl=chl2[1,],par=par2[1,],
                      lat=lat,lon=lon,depth=depth,
                      month=month,daylength=daylength,
                      PBmax=PBmax,alpha=alpha,Ek=Ek,
                      region=region)
 for(i in 2:365){
-  D[[i]] <- data.frame(sst=colMeans(sst2[1:i,],na.rm=TRUE),
+  D_nc[[i]] <- data.frame(sst=colMeans(sst2[1:i,],na.rm=TRUE),
                        chl=colMeans(chl2[1:i,],na.rm=TRUE),
                        par=colMeans(par2[1:i,],na.rm=TRUE),
                        lat=lat,lon=lon,depth=depth,
@@ -64,6 +64,21 @@ for(i in 2:365){
 
 
 
+D_nc_365 <- list()
+D_nc_365[[1]] <- data.frame(sst=sst2[1,],chl=chl2[1,],par=par2[1,],
+                            lat=lat,lon=lon,depth=depth,
+                            month=month,daylength=daylength,
+                            PBmax=PBmax,alpha=alpha,Ek=Ek,
+                            region=region)
+for(i in 2:365){
+  D_nc_365[[i]] <- data.frame(sst=sst2[1:i,],
+                              chl=chl2[1:i,],
+                              par=par2[1:i,],
+                              lat=lat,lon=lon,depth=depth,
+                              month=month,daylength=daylength,
+                              PBmax=PBmax,alpha=alpha,Ek=Ek,
+                              region=region)
+}
 
 
 

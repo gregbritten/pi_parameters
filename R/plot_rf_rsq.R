@@ -1,4 +1,4 @@
-plot_rf_rsq <- function(fits,parm,ylim_rmse,ylim_r2,legend=FALSE,text,outer=FALSE,ntime){
+plot_rf_rsq <- function(fits,parm,max=TRUE,ylim_rmse,ylim_r2,legend=FALSE,text,outer=FALSE,ntime){
   #par(mfrow=c(1,2),mar=c(2,2,2,2),oma=c(3,3,2,2))
   plot(-999,xlim=c(-ntime,0),ylim=c(ylim_r2[1],ylim_r2[2]))
   for(j in 1:5){
@@ -10,7 +10,7 @@ plot_rf_rsq <- function(fits,parm,ylim_rmse,ylim_r2,legend=FALSE,text,outer=FALS
       imp
     }))
     lines(-(ntime-1):0,xx[ntime:1],col=cols[j])
-    abline(v={-(ntime-1):0}[xx[ntime:1]==max(xx[ntime:1])],lty=3,col=cols[j])
+    if(max==TRUE) abline(v={-(ntime-1):0}[xx[ntime:1]==max(xx[ntime:1])],lty=3,col=cols[j])
     #abline(h=xx[30],lty=2,col=cols[j])
   }
   mtext(side=2,expression('R'^2),line=2)
@@ -25,7 +25,7 @@ plot_rf_rsq <- function(fits,parm,ylim_rmse,ylim_r2,legend=FALSE,text,outer=FALS
       imp
     }))
     lines(-(ntime-1):0,xx[ntime:1],col=cols[j])
-    abline(v={-(ntime-1):0}[xx[ntime:1]==min(xx[ntime:1])],lty=3,col=cols[j])
+    if(max==TRUE) abline(v={-(ntime-1):0}[xx[ntime:1]==min(xx[ntime:1])],lty=3,col=cols[j])
   }
   #plot(-999,xlim=c(0,30),ylim=c(-0.05,0.6))
   mtext(side=2,expression('RMSE'),line=2)    
