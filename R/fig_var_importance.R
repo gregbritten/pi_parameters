@@ -20,8 +20,8 @@ cols <- c('dark green',turbo(4)[c(4,3)])
 
 ##--60 Days--##########
 pdf('plots/variable_importance_60.pdf',height=4,width=11)
+ylims=rep(0.6,5)
 par(mfrow=c(2,6),mar=c(1.5,2,0,0),oma=c(3,3,3,3),cex.axis=0.7)
-ylims=rep(0.7,5)
 plot_rf_importance(fits=fits_PBmax_chl_F_365,chl=TRUE,terms=c('chl','sst','par'),labs=TRUE,
                    ntime=60)
   mtext(expression(italic('P'['max']^'B')),side=1)
