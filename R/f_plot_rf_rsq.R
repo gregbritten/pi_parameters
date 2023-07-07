@@ -1,4 +1,4 @@
-plot_rf_rsq <- function(fits,parm,max=TRUE,ylim_rmse,ylim_r2,legend=FALSE,text,outer=FALSE,ntime){
+f_plot_rf_rsq <- function(fits,parm,max=TRUE,ylim_rmse,ylim_r2,legend=FALSE,text,outer=FALSE,ntime){
   #par(mfrow=c(1,2),mar=c(2,2,2,2),oma=c(3,3,2,2))
   plot(-999,xlim=c(-ntime,0),ylim=c(ylim_r2[1],ylim_r2[2]))
   for(j in 1:5){

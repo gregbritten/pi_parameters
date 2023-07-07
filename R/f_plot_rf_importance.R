@@ -1,4 +1,4 @@
-plot_rf_importance <- function(fits,chl=FALSE,terms,labs=FALSE,xaxt=FALSE,ntime){
+f_plot_rf_importance <- function(fits,chl=FALSE,terms,labs=FALSE,xaxt=FALSE,ntime){
   #par(mfrow=c(2,3),mar=c(2,2,2,2),oma=c(3,3,2,2))
   for(j in 1:5){
     
