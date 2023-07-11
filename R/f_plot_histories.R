@@ -1,4 +1,4 @@
-f_plot_histories <- function(D,vars,ntime){
+f_plot_histories <- function(D,vars,ntime,regions){
   k <- 1
   for(p in 1:length(vars)){
     for(j in 1:length(regions)){

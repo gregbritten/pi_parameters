@@ -1,14 +1,12 @@
 library(viridis)
-library(randomForest)
 
-source('r/plot_rf_rsq.r') ##
+source('r/f_plot_rf_rsq.R') ##
 
 ##--Load fitted random forests--###########
-fits_Ek_chl_T    <- readRDS('results/fits_Ek_chl_T.rds')
-fits_PBmax_chl_T <- readRDS('results/fits_PBmax_chl_T.rds')
-fits_alpha_chl_T <- readRDS('results/fits_alpha_chl_T.rds')
+fits_Ek_chl_F_365    <- readRDS('results/fits_Ek_chl_T.rds')
+fits_PBmax_chl_F_365 <- readRDS('results/fits_PBmax_chl_T.rds')
+fits_alpha_chl_T     <- readRDS('results/fits_alpha_chl_T.rds')
 
-region_long <- c('Scotian Shelf','Labrador Sea','South Pacific','Southern Ocean','Iceland Shelf')
 
 ##--60 Days--##################
 pdf('plots/rq_timescale_full_false_60.pdf',height=4,width=7.5)
