@@ -9,4 +9,3 @@ pdf('plots/efolds.pdf',height=3,width=11)
 par(mfrow=c(1,5),mar=c(0,2,0,0),oma=c(4,5,3,3),cex.axis=0.8)
 plot_efolds(D,breaks=seq(0,60,4),ylim=c(0,0.2),xlim=c(0,60))
 dev.off()
-
