@@ -1,7 +1,6 @@
 #source('r/process_csvs.r') ##--data processing--###########
 source('r/plot_histories.R')
 
-regions <- c('scot','lab','spac','tas','ice')
 vars <- c('par','sst','chl')
 ylims <- list(c(-40,40),c(-5,5),c(-3,3))
 var_long <- c(expression(Delta*bar('PAR')*'('*italic('t'['i'])*')'),

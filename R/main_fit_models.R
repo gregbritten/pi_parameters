@@ -1,4 +1,4 @@
-library(randomForests)
+library(randomForest)
 source('r/main_process_nc.R')
 source('r/f_fit_rf.r')
 
