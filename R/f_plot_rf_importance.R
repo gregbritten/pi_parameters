@@ -2,7 +2,7 @@ f_plot_rf_importance <- function(fits,chl=FALSE,terms,labs=FALSE,xaxt=FALSE,ntim
   #par(mfrow=c(2,3),mar=c(2,2,2,2),oma=c(3,3,2,2))
   for(j in 1:5){
     
-    plot(-999,xlim=c(-ntime,0),ylim=c(0,ylims[j]),xaxt='n')
+    plot(-999,xlim=c(-ntime,1),ylim=c(0,ylims[j]),xaxt='n')
     if(labs==TRUE) mtext(nms[j],adj=0)
     if(xaxt==TRUE) axis(side=1)
     if(chl==FALSE){
@@ -25,7 +25,7 @@ f_plot_rf_importance <- function(fits,chl=FALSE,terms,labs=FALSE,xaxt=FALSE,ntim
           #imp <- abs(imp)
           abs(imp[names(imp)==terms[p]])
         }))
-        lines(-ntime:-1,xx[ntime:1],col=cols[p])
+        lines(-ntime:-2,xx[ntime:2],col=cols[p])
         abline(h=mean(xx),col=cols[p],lty=2)}}
   }
 }
