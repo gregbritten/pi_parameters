@@ -35,7 +35,6 @@ f_plot_rf_importance(fits=fits_alpha_chl_F_365,chl=TRUE,terms=c('par','sst','chl
   mtext(outer=TRUE,expression('Initial Time '*italic('t'['i'])),side=1,line=1.5)
 dev.off()
 
-
 ##--365 Days--######################
 pdf('plots/variable_importance_365.pdf',height=4,width=11)
 par(mfrow=c(2,6),mar=c(1.5,2,0,0),oma=c(3,3,3,3),cex.axis=0.7)
