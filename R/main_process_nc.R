@@ -1,5 +1,7 @@
 library(ncdf4)
 
+source('R/brewin.R')
+
 regions     <- c('scot',         'lab',         'spac',         'tas',           'ice')
 region_long <- c('Scotian Shelf','Labrador Sea','South Pacific','Southern Ocean','Iceland Shelf')
 
@@ -39,16 +41,23 @@ for(i in 1:length(ice_i)){
 
 ##--Create dataset for analysis--#####################
 D_nc <- list()
-D_nc[[1]] <- data.frame(sst=sstnc[1,],chl=chlnc[1,],par=parnc[1,],
-                     lat=lat,lon=lon,depth=depth,
-                     month=month,
-                     PBmax=PBmax,alpha=alpha,Ek=Ek,
-                     region=region)
+D_nc[[1]] <- data.frame(sst=sstnc[1,],
+                        chl=chlnc[1,],
+                        par=parnc[1,],
+                        pico=sapply(1:1954,function(x) pico(G,H,J,K,C=chlnc[1,x],SST=sstnc[1,x])),
+                        lat=lat,lon=lon,depth=depth,
+                        month=month,
+                        PBmax=PBmax,alpha=alpha,Ek=Ek,
+                        region=region)
 
 for(i in 2:365){
-  D_nc[[i]] <- data.frame(sst=colMeans(sstnc[1:i,],na.rm=TRUE),
-                          chl=colMeans(chlnc[1:i,],na.rm=TRUE),
-                          par=colMeans(parnc[1:i,],na.rm=TRUE),
+  sst=colMeans(sstnc[1:i,],na.rm=TRUE)
+  chl=colMeans(chlnc[1:i,],na.rm=TRUE)
+  par=colMeans(parnc[1:i,],na.rm=TRUE)
+  D_nc[[i]] <- data.frame(sst=sst,
+                          chl=chl,
+                          par=par,
+                          pico=sapply(1:1954,function(x) pico(G,H,J,K,C=chl[x],SST=sst[x])),
                           lat=lat,lon=lon,depth=depth,
                           month=month,
                           PBmax=PBmax,alpha=alpha,Ek=Ek,

@@ -4,9 +4,9 @@ library(corrplot)
 source('r/f_plot_rf_importance.r') ##variable importance plot
 
 ##--Load fitted random forests--###########
-fits_Ek_chl_T  <- readRDS('results/fits_Ek_chl_T.rds')
-fits_PBmax_chl <- readRDS('results/fits_PBmax_chl_T.rds')
-fits_alpha_chl <- readRDS('results/fits_alpha_chl_T.rds')
+fits_Ek_chl_F_365    <- readRDS('results/fits_Ek_chl_F_365.rds')
+fits_PBmax_chl_F_365 <- readRDS('results/fits_PBmax_chl_F_365.rds')
+fits_alpha_chl_F_365 <- readRDS('results/fits_alpha_chl_F_365.rds')
 
 regions     <- c('scot','lab','spac','tas','ice')
 region_long <- c('Scotian Shelf','Labrador Sea','South Pacific','Southern Ocean','Iceland Shelf','Global')
@@ -16,13 +16,13 @@ region_long <- c('Scotian Shelf','Labrador Sea','South Pacific','Southern Ocean'
 lets <- c('a)','b)','c)','d)','e)','f)')
 nms <- numeric(6)
 for(i in 1:6) nms[i] <- paste(lets[i],region_long[i])
-cols <- c(turbo(4)[c(3,4)],'dark green')
+cols <- c(turbo(4)[c(3,4)],'dark green','black')
 
 ##--60 Days--##########
 pdf('plots/variable_importance_60.pdf',height=3.75,width=11)
 ylims=rep(0.6,5)
 par(mfrow=c(2,6),mar=c(1.5,2,0,0),oma=c(3,3,3,3),cex.axis=0.7)
-f_plot_rf_importance(fits=fits_PBmax_chl_F_365,chl=TRUE,terms=c('par','sst','chl'),labs=TRUE,
+f_plot_rf_importance(fits=fits_PBmax_chl_F_365,chl=TRUE,terms=c('par','sst','chl','pico'),labs=TRUE,
                    ntime=60)
   mtext(expression(italic('P'['max']^'B')),side=1)
   plot(-999,xaxt='n',yaxt='n',xlim=c(0,1),ylim=c(0,1),bty='n')

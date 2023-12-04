@@ -3,9 +3,9 @@ library(viridis)
 source('r/f_plot_rf_rsq.R') ##
 
 ##--Load fitted random forests--###########
-fits_Ek_chl_F_365    <- readRDS('results/fits_Ek_chl_T.rds')
-fits_PBmax_chl_F_365 <- readRDS('results/fits_PBmax_chl_T.rds')
-fits_alpha_chl_F_365 <- readRDS('results/fits_alpha_chl_T.rds')
+fits_Ek_chl_F_365    <- readRDS('results/fits_Ek_chl_F_365.rds')
+fits_PBmax_chl_F_365 <- readRDS('results/fits_PBmax_chl_F_365.rds')
+fits_alpha_chl_F_365 <- readRDS('results/fits_alpha_chl_F_365.rds')
 
 
 ##--60 Days--##################
