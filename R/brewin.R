@@ -21,21 +21,14 @@ K <- c(0.503,
       0.258)
 
 
-Cm_pn <- function(G, SST){
-  return(1 - (G[1]/(1+exp(-G[2]*(SST-G[3]))) + G[4]))
-}
+Cm_pn <- function(G, SST) return(1 - (G[1]/(1+exp(-G[2]*(SST-G[3]))) + G[4]))
 
-Cm_p <- function(H, SST){
-  return(1 - (H[1]/(1+exp(-H[2]*(SST-H[3]))) + H[4]))
-}
+Cm_p <- function(H, SST) return(1 - (H[1]/(1+exp(-H[2]*(SST-H[3]))) + H[4]))
 
-D_pn <- function(J, SST){
-  return(J[1]/(1+exp(-J[2]*(SST-J[3]))) + J[4])
-}
+D_pn <- function(J, SST) return(J[1]/(1+exp(-J[2]*(SST-J[3]))) + J[4])
 
-D_p <- function(K, SST){
-  return(K[1]/(1+exp(-K[2]*(SST-K[3]))) + K[4])
-}
+D_p <- function(K, SST) return(K[1]/(1+exp(-K[2]*(SST-K[3]))) + K[4])
+
 
 brewin <- function(G, H, J, K, C, SST){
   C_pn <- Cm_pn(G,SST)*(1-exp(-(D_pn(J,SST)/Cm_pn(G,SST))*C))
@@ -50,8 +43,15 @@ pico <- function(G,H,J,K,C,SST){
   return(bb[1]/C)
 }
 
+nano_pico <- function(G,H,J,K,C,SST){
+  bb <- brewin(G,H,J,K,C,SST)
+  bb[2]/bb[1]
+}
 
-
+micro_nano <- function(G,H,J,K,C,SST){
+  bb <- brewin(G,H,J,K,C,SST)
+  bb[3]/bb[2]
+}
 
 
 
