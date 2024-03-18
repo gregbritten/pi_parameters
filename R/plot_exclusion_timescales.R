@@ -4,7 +4,7 @@ p <- c(u1=1,
        u2=0.2,
        K=1,
        m=0.1,
-       S=0.1)
+       S=1)
 x0 <- 1
 T <- 1000
 dt <- 0.1
@@ -15,8 +15,8 @@ ss <- function(p,dt,T,x0){
   B1[1] = B2[1] = N[1] <- x0
   
   for(i in 2:T){
-    dB1_dt <- p['u1']*B1[i-1]*(N[i-1]/(N[i-1]+K)) - p['m']*B1[i-1]
-    dB2_dt <- p['u2']*B2[i-1]*(N[i-1]/(N[i-1]+K)) - p['m']*B2[i-1]
+    dB1_dt <- p['u1']*B1[i-1]*(N[i-1]/(N[i-1]+p['K'])) - p['m']*B1[i-1]
+    dB2_dt <- p['u2']*B2[i-1]*(N[i-1]/(N[i-1]+p['K'])) - p['m']*B2[i-1]
     dN_dt  <- p['S'] - p['u1']*B1[i-1]*(N[i-1]/(N[i-1]+p['K'])) - p['u2']*B2[i-1]*(N[i-1]/(N[i-1]+p['K']))
     
     B1[i] <- B1[i-1] + dB1_dt*dt  
@@ -26,6 +26,8 @@ ss <- function(p,dt,T,x0){
   return(data.frame(B1=B1,B2=B2))
 }
 
+
+pdf('~/dropbox/working/pi_parameters/github/plots/exclusion_timescales.pdf',height=4,width=5)
 x0 <- 0.5
 p['u2'] <- 0.2
   matplot(time,ss(p,dt,T,x0),type='l',lty=1,col='black',ylab='',xlab='Time [days]')
@@ -52,11 +54,5 @@ legend('right',legend=c(expression(Delta*mu~'= 0.8'),
                         expression(Delta*mu~'= 0.5'),
                         expression(Delta*mu~'= 0.2'),
                         expression(Delta*mu~'= 0.1')),bty='n',lty=c(1,2,3,4),cex=0.8)
-  
+dev.off()
 
-plot(B2)
-
-plot(time,B2/B1)
-plot(time,N)
-
-plot(time,B2)
