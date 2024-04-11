@@ -1,4 +1,5 @@
 library(ncdf4)
+library(tidyverse)
 
 source('R/brewin.R')
 
@@ -49,7 +50,16 @@ D_nc[[1]] <- data.frame(sst=sstnc[1,],
                         lat=lat,lon=lon,depth=depth,
                         month=month,
                         PBmax=PBmax,alpha=alpha,Ek=Ek,
-                        region=region)
+                        region=region,
+                        date=date[1,])
+
+##--print dataset for comparison--######################
+
+dat <- D_nc[[1]] %>% 
+  mutate(date=as.Date(date,origin="1998-03-20")) %>%
+  filter(region %in% regions)
+write.csv(file='dat.csv',dat,row.names=FALSE)
+
 
 for(i in 2:365){
   sst=colMeans(sstnc[1:i,],na.rm=TRUE)
@@ -63,7 +73,8 @@ for(i in 2:365){
                           lat=lat,lon=lon,depth=depth,
                           month=month,
                           PBmax=PBmax,alpha=alpha,Ek=Ek,
-                          region=region)
+                          region=region,
+                          date=date[1,])
 }
 
 #D_nc_365 <- list()
