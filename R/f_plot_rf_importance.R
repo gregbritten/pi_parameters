@@ -10,8 +10,8 @@ f_plot_rf_importance <- function(fits,chl=FALSE,terms,labs=FALSE,xaxt=FALSE,ntim
           xx <- unlist(lapply(1:ntime,function(i){
             imp <- fits[[j]][[i]][[1]]$importance[,1]
             #imp <- abs(imp)/sum(abs(imp[names(imp)%in%terms]))
-            imp <- abs(imp)/sum(abs(imp))
-            #imp <- abs(imp)
+            #imp <- abs(imp)/sum(abs(imp))
+            imp <- abs(imp)
             abs(imp[names(imp)==terms[p]])
           }))
           lines(xx,col=cols[p])
@@ -21,8 +21,8 @@ f_plot_rf_importance <- function(fits,chl=FALSE,terms,labs=FALSE,xaxt=FALSE,ntim
         xx <- unlist(lapply(1:ntime,function(i){
           imp <- fits[[j]][[i]][[1]]$importance[,1]
           #imp <- abs(imp)/sum(abs(imp[names(imp)%in%terms]))
-          imp <- abs(imp)/sum(abs(imp))
-          #imp <- abs(imp)
+          #imp <- abs(imp)/sum(abs(imp))
+          imp <- abs(imp)
           abs(imp[names(imp)==terms[p]])
         }))
         lines(-ntime:-2,xx[ntime:2],col=cols[p])
