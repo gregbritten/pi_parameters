@@ -81,18 +81,3 @@ for(i in 2:365){
                           date=date[1,])
 }
 
-#D_nc_365 <- list()
-#D_nc_365[[1]] <- data.frame(sst=sst2[1,],chl=chl2[1,],par=par2[1,],
-#                            lat=lat,lon=lon,depth=depth,
-#                            month=month,
-#                            PBmax=PBmax,alpha=alpha,Ek=Ek,
-#                            region=region)
-#for(i in 2:365){
-#  D_nc_365[[i]] <- data.frame(sst=t(sst2[1:i,]),
-#                              chl=t(chl2[1:i,]),
-#                              par=t(par2[1:i,]),
-#                              lat=lat,lon=lon,depth=depth,
-#                              month=month,
-#                              PBmax=PBmax,alpha=alpha,Ek=Ek,
-#                              region=region)
-#}
