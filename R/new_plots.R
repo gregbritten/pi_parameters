@@ -1,4 +1,5 @@
 library(viridis)
+library(randomForest)
 source('r/main_process_nc.R')
 
 FITS <- readRDS("results/FITS.rds")
@@ -11,25 +12,22 @@ pdf('plots/RSQ.pdf',height=4,width=6.5)
 par(mfrow=c(1,2),mar=c(2,1,2,1.5),oma=c(3,3,3,3),cex.axis=0.8)
 p1 <- unlist(RSQ[["reg"]][["PBmax"]])
 p2 <- unlist(RSQ[["lm"]][["PBmax"]])
-plot(p1,type='l',ylim=c(0.3,0.8),bty='n')
-lines(p2,lty=2)
-abline(v=which(p1==max(p1)),lty=1)
-abline(v=which(p2==max(p2)),lty=2)
-mtext(side=2,expression(italic('R'^2)),line=2.5,cex=1.2)
-mtext(expression(italic('a) P'['max']^'B')~'[mg C (mg chla)'^{-1}~'h'^{-1}*']'),adj=0)
+  plot(p1,type='l',ylim=c(0.3,0.8),bty='n')
+  lines(p2,lty=2)
+  abline(v=which(p1==max(p1)),lty=1)
+  abline(v=which(p2==max(p2)),lty=2)
+  mtext(side=2,expression(italic('R'^2)),line=2.5,cex=1.2)
+  mtext(expression(italic('a) P'['max']^'B')~'[mg C (mg chla)'^{-1}~'h'^{-1}*']'),adj=0)
 
 p1 <- unlist(RSQ[["reg"]][["Ek"]])
 p2 <- unlist(RSQ[["lm"]][["Ek"]])
-
-plot(p1,type='l',ylim=c(0.3,0.8),yaxt='n',cex.axis=0.8,bty='n'); axis(side=2,labels=NA)
-lines(p2,lty=2)
-abline(v=which(p1==max(p1)),lty=1)
-abline(v=which(p2==max(p2)),lty=2)
-
-mtext(side=1,outer=TRUE,'Days',line=0.5)
-mtext(expression(italic('b) E'['k'])~'['*mu*'mol quanta m'^{-2}~'s'^{-1}*']'),adj=0)
+  plot(p1,type='l',ylim=c(0.3,0.8),yaxt='n',cex.axis=0.8,bty='n'); axis(side=2,labels=NA)
+  lines(p2,lty=2)
+  abline(v=which(p1==max(p1)),lty=1)
+  abline(v=which(p2==max(p2)),lty=2)
+  mtext(side=1,outer=TRUE,'Days',line=0.5)
+  mtext(expression(italic('b) E'['k'])~'['*mu*'mol quanta m'^{-2}~'s'^{-1}*']'),adj=0)
 dev.off()
-
 
 
 
@@ -89,7 +87,7 @@ for(i in 1:length(regions)){
   lines(xx$x,xx$y,col=cols[i])
 }
 mtext(side=2,expression(italic('E'['k'])~'['*mu*'mol quanta m'^{-2}~'s'^{-1}*']'),line=2.5,cex=0.75)
-mtext(side=1,expression(italic('PAR')),line=2.5)
+mtext(side=1,expression(italic('PAR')~'[E/m'^2*'/d]'),line=2.75)
 mtext('e)',adj=0.05,line=-1.5)
 
 ##SST##
@@ -98,7 +96,7 @@ for(i in 1:length(regions)){
   xx <- partialPlot(FITS[["reg"]][["Ek"]][[24]],x.var='sst',pred.data=d %>% filter(region==regions[i]),plot=FALSE)
   lines(xx$x,xx$y,col=cols[i])
 }
-mtext(side=1,expression(italic('SST')),line=2.5)
+mtext(side=1,expression(italic('SST')~'['*degree*'C]'),line=2.75)
 mtext('f)',adj=0.05,line=-1.5)
 
 ##nano_pico##
@@ -107,7 +105,7 @@ for(i in 1:length(regions)){
   xx <- partialPlot(FITS[["reg"]][["Ek"]][[24]],x.var='pico',pred.data=d %>% filter(region==regions[i]),plot=FALSE)
   lines(xx$x,xx$y,col=cols[i])
 }
-mtext(side=1,expression(italic('c'['pico']*'/c'['total'])),line=2.5)
+mtext(side=1,expression(italic('c'['pico']*'/c'['total'])),line=2.75)
 mtext('g)',adj=0.05,line=-1.5)
 
 ##depth##
@@ -116,7 +114,7 @@ for(i in 1:length(regions)){
   xx <- partialPlot(FITS[["reg"]][["Ek"]][[24]],x.var='depth',pred.data=d %>% filter(region==regions[i]),plot=FALSE)
   lines(xx$x,xx$y,col=cols[i])
 }
-mtext(side=1,expression(italic('depth')),line=2.5)
+mtext(side=1,expression(italic('Depth')~'[m]'),line=2.75)
 mtext('h)',adj=0.05,line=-1.5)
 
 dev.off()
@@ -126,8 +124,8 @@ dev.off()
 ###############################################
 ###############################################
 plotlm <- function(fit,add=FALSE,ylims,labs){
-  coef <- summary(fit)$coefficients[,1]
-  ses  <- summary(fit)$coefficients[,2]
+  coef <- summary(fit)$coefficients[c(1,3,2,5,4),1]  #reordering variables to be consistent across plots
+  ses  <- summary(fit)$coefficients[c(1,3,2,5,4),2]
   n    <- length(coef)
   if(add==FALSE){
     #plot(1:n,coef,ylim=c(min(coef-2*ses),max(coef+2*ses)),pch=19,xaxt='n')
@@ -150,19 +148,19 @@ plotlm <- function(fit,add=FALSE,ylims,labs){
 pdf('plots/lm_effects.pdf',height=3.75,width=7)
 par(mfrow=c(1,2),mar=c(2,2,2,0),oma=c(4,4,2,2),cex.axis=0.8)
 plotlm(FITS[["lm"]][["PBmax"]][[34]],ylim=c(-0.8,0.8),labs=c(expression(italic("Intercept")),
-                                              expression(italic("SST")),
-                                              expression(italic("PAR")),
-                                              expression(italic("Depth")),
-                                              expression(italic("f"["pico"]))))
+                                                             expression(italic("PAR")),
+                                                             expression(italic("SST")),
+                                                             expression(italic('c'['pico']*'/c'['total'])),
+                                                             expression(italic("Depth"))))
 axis(side=2,at=seq(-0.8,0.8,0.2))
 mtext(expression(italic('a) P'['max']^'B')~'[mg C (mg chla)'^{-1}~'h'^{-1}*']'),adj=0)
 
 mtext(side=2,expression('Standardized Slope ['*Delta*'sdY/'*Delta*'sdX]'),line=2.5)
 plotlm(FITS[["lm"]][["Ek"]][[24]],ylim=c(-0.8,0.8),labs=c(expression(italic("Intercept")),
-                                                   expression(italic("SST")),
                                                    expression(italic("PAR")),
-                                                   expression(italic("Depth")),
-                                                   expression(italic("f"["pico"]))))
+                                                   expression(italic("SST")),
+                                                   expression(italic('c'['pico']*'/c'['total'])),
+                                                   expression(italic("Depth"))))
 mtext(expression(italic('b) E'['k'])~'['*mu*'mol quanta m'^{-2}~'s'^{-1}*']'),adj=0)
 dev.off()
 
