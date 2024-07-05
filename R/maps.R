@@ -49,11 +49,14 @@ pred_f <- function(chl,sst,par,day,fit){
 ##--prdiction--##############
 library(maps)
 library(viridis)
-cols <- turbo(18)
+
 
 pdf('plots/maps.pdf',height=5,width=10)
-par(mfrow=c(2,3),mar=c(1,1,1,1),oma=c(2,2,2,4),cex.lab=0.8)
+par(mfrow=c(2,3),mar=c(1,1,1,1),oma=c(2,2,2,4),cex.lab=0.8,oma=c(2,2,2,2))
+
 zlims <- c(2,6)
+ncols <- 15
+cols  <- turbo(ncols)
 image(lons,lats,pred_f(chl=chl_avg_24,sst=sst_avg_24,par=par_avg_24,
                             day=1,fit=FITS[["reg"]][["PBmax"]][[day_PBmax]]),
            xaxt='n',col=cols,zlim=zlims)  
@@ -69,6 +72,8 @@ image.plot(matrix(zlims),col=cols,legend.only=TRUE)
 
 ##--Ek--####
 zlims <- c(0,350)
+ncols <- 8*3
+cols <- turbo(ncols)
 image(lons,lats,pred_f(chl=chl_avg_34,sst=sst_avg_34,par=par_avg_34,
                   day=1,fit=FITS[["reg"]][["Ek"]][[day_Ek]]),
       col=cols,zlim=zlims)  
@@ -79,5 +84,5 @@ image(lons,lats,pred_f(chl=chl_avg_34,sst=sst_avg_34,par=par_avg_34,
   map(add=TRUE,col='grey',fill=TRUE,border=NA)
 plot.new()
 image.plot(matrix(zlims),col=cols,legend.only=TRUE)
-  
+
 dev.off()
