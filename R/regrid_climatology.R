@@ -1,11 +1,18 @@
-source('~/dropbox/code/functions/resize_bilinear().R')
-
 library(fields)
 library(ncdf4)
-###############################################
-## CHL ########################################
-###############################################
-nc_chl <- nc_open("~/dropbox/working/pi_parameters/climatology/clim_chl.nc")
+
+##--function for interpolation
+resize_bilinear <- function(xin,yin,xout,yout,z){
+  obj   <- list(x=1:xin, y=1:yin, z = z)
+  tempx <- seq(1,xin,length.out=xout)
+  tempy <- seq(1,yin,length.out=yout)
+  loc   <- make.surface.grid(list(tempx,tempy))
+  look  <- interp.surface(obj,loc)
+  return(as.surface(loc,look)$z)
+}
+
+##--chl--#################
+nc_chl <- nc_open("processed_data/clim_chl.nc")
   lat <- ncvar_get(nc_chl,'lat')
   lon <- ncvar_get(nc_chl,'lon')
 
@@ -17,12 +24,10 @@ print(i)
   chl[,,i] <- gg
 }
 nc_close(nc_chl)
-saveRDS(chl,file='~/dropbox/working/pi_parameters/climatology/chl.rds')
+saveRDS(chl,file='processed_data/chl.rds')
 
-###############################################
-## PAR ########################################
-###############################################
-nc_par <- nc_open("~/dropbox/working/pi_parameters/climatology/clim_par.nc")
+##--par--####################
+nc_par <- nc_open("processed_data/clim_par.nc")
 
 par <- array(NA,dim=c(360,180,365))
 for(i in 1:365){
@@ -32,12 +37,10 @@ print(i)
   par[,,i] <- gg
 }
 nc_close(nc_par)
-saveRDS(par,file='~/dropbox/working/pi_parameters/climatology/par.rds')
+saveRDS(par,file='processed_data/par.rds')
 
-###############################################
-## SST ########################################
-###############################################
-nc_sst <- nc_open("~/dropbox/working/pi_parameters/climatology/clim_sst.nc")
+##--sst--######################
+nc_sst <- nc_open("processed_data/clim_sst.nc")
 
 sst <- array(NA,dim=c(360,180,365))
 for(i in 1:365){
@@ -47,9 +50,6 @@ for(i in 1:365){
   sst[,,i] <- gg
 }
 nc_close(nc_sst)
-saveRDS(sst,file='~/dropbox/working/pi_parameters/climatology/sst.rds')
-
-
-
+saveRDS(sst,file='processed_data/sst.rds')
 
 

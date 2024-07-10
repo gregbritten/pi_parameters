@@ -1,15 +1,13 @@
-
 library(reprtree)
 
-par(mfrow=c(1,1))
+day_Ek    <- 34
+day_PBmax <- 24
 
-par(mfrow=c(2,3))
+##--extract best fitting model--########
+mod_Ek    <- FITS[["reg"]][["Ek"]][[day_Ek]]
+mod_PBmax <- FITS[["reg"]][["PBmax"]][[day_PBmax]]
 
-mod_Ek    <- FITS[["reg"]][["Ek"]][[34]]
-mod_PBmax <- FITS[["reg"]][["PBmax"]][[24]]
-
-
-ss <- sample(1:500,size=6)
+ss <- sample(1:500,size=6) #choose six random trees from the ensemble of 500
 
 pdf('plots/trees_Ek.pdf',height=12,width=20)
 par(mfrow=c(2,3),cex=1.25,mar=c(1,1,1,1))

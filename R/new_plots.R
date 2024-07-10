@@ -30,19 +30,16 @@ p2 <- unlist(RSQ[["lm"]][["Ek"]])
 dev.off()
 
 
-
+#############################################
+## EFFECTS ##################################
+#############################################
 cols <- turbo(5)
 
-###########################################
-## PBmax ##################################
-###########################################
 pdf('plots/partial_effects.pdf',height=4,width=8)
 par(mfrow=c(2,4),mar=c(0.5,0.5,0.5,0.5),oma=c(4,5,3,3))
 
-###########################################
-## PBmax ##################################
-###########################################
-##PAR##
+##--PBmax--###########################
+##par
 plot(-999,xlim=c(0,80),ylim=c(2,5),xlab='',ylab='',xaxt='n'); axis(side=1,labels=FALSE); axis(side=2,labels=FALSE)
 for(i in 1:length(regions)){
   xx <- partialPlot(FITS[["reg"]][['PBmax']][[34]],x.var='par',pred.data=d %>% filter(region==regions[i]),plot=FALSE)
@@ -52,7 +49,7 @@ mtext(side=2,expression(italic('P'['max']^'B')~'[mg C (mg chla)'^{-1}~'h'^{-1}*'
 mtext('a)',adj=0.05,line=-1.5)
 legend('topright',legend=region_long,lty=1,col=cols,bty='n',cex=0.8)
 
-##SST##
+##sst
 plot(-999,xlim=c(-2,30),ylim=c(2,5),xlab='',ylab='',yaxt='n',xaxt='n'); axis(side=2,labels=FALSE)
 for(i in 1:length(regions)){
   xx <- partialPlot(FITS[["reg"]][["PBmax"]][[34]],x.var='sst',pred.data=d %>% filter(region==regions[i]),plot=FALSE)
@@ -60,7 +57,7 @@ for(i in 1:length(regions)){
 }
 mtext('b)',adj=0.05,line=-1.5)
 
-##nano_pico##
+##pico
 plot(-999,xlim=c(0,0.8),ylim=c(2,5),xlab='',ylab='',yaxt='n',xaxt='n'); axis(side=2,labels=FALSE)
 for(i in 1:length(regions)){
   xx <- partialPlot(FITS[["reg"]][["PBmax"]][[34]],x.var='pico',pred.data=d %>% filter(region==regions[i]),plot=FALSE)
@@ -68,7 +65,7 @@ for(i in 1:length(regions)){
 }
 mtext('c)',adj=0.05,line=-1.5)
 
-##depth##
+##depth
 plot(-999,xlim=c(0,40),ylim=c(2,5),xlab='',ylab='',yaxt='n',xaxt='n'); axis(side=2,labels=FALSE)
 for(i in 1:length(regions)){
   xx <- partialPlot(FITS[["reg"]][["PBmax"]][[34]],x.var='depth',pred.data=d %>% filter(region==regions[i]),plot=FALSE)
@@ -76,11 +73,8 @@ for(i in 1:length(regions)){
 }
 mtext('d)',adj=0.05,line=-1.5)
 
-
-#########################
-## Ek ###################
-#########################
-##PAR##
+##--Ek--######################
+##par
 plot(-999,xlim=c(0,80),ylim=c(0,200),xlab='',ylab='',xaxt='n'); axis(side=1)
 for(i in 1:length(regions)){
   xx <- partialPlot(FITS[["reg"]][["Ek"]][[24]],x.var='par',pred.data=d %>% filter(region==regions[i]),plot=FALSE)
@@ -90,7 +84,7 @@ mtext(side=2,expression(italic('E'['k'])~'['*mu*'mol quanta m'^{-2}~'s'^{-1}*']'
 mtext(side=1,expression(italic('PAR')~'[E/m'^2*'/d]'),line=2.75)
 mtext('e)',adj=0.05,line=-1.5)
 
-##SST##
+##sst
 plot(-999,xlim=c(-2,30),ylim=c(0,200),xlab='',ylab='',xaxt='n',yaxt='n'); axis(side=1); axis(side=2,labels=FALSE)
 for(i in 1:length(regions)){
   xx <- partialPlot(FITS[["reg"]][["Ek"]][[24]],x.var='sst',pred.data=d %>% filter(region==regions[i]),plot=FALSE)
@@ -99,7 +93,7 @@ for(i in 1:length(regions)){
 mtext(side=1,expression(italic('SST')~'['*degree*'C]'),line=2.75)
 mtext('f)',adj=0.05,line=-1.5)
 
-##nano_pico##
+##pico
 plot(-999,xlim=c(0,0.8),ylim=c(0,200),xlab='',ylab='',xaxt='n',yaxt='n'); axis(side=1); axis(side=2,labels=FALSE)
 for(i in 1:length(regions)){
   xx <- partialPlot(FITS[["reg"]][["Ek"]][[24]],x.var='pico',pred.data=d %>% filter(region==regions[i]),plot=FALSE)
@@ -108,7 +102,7 @@ for(i in 1:length(regions)){
 mtext(side=1,expression(italic('c'['pico']*'/c'['total'])),line=2.75)
 mtext('g)',adj=0.05,line=-1.5)
 
-##depth##
+##depth
 plot(-999,xlim=c(0,40),ylim=c(0,200),xlab='',ylab='',xaxt='n',yaxt='n'); axis(side=1); axis(side=2,labels=FALSE)
 for(i in 1:length(regions)){
   xx <- partialPlot(FITS[["reg"]][["Ek"]][[24]],x.var='depth',pred.data=d %>% filter(region==regions[i]),plot=FALSE)
@@ -120,9 +114,9 @@ mtext('h)',adj=0.05,line=-1.5)
 dev.off()
 
 
-
-###############################################
-###############################################
+####################################################
+## MIXED EFFECTS REGRESSION EFFECTS ################
+####################################################
 plotlm <- function(fit,add=FALSE,ylims,labs){
   coef <- summary(fit)$coefficients[c(1,3,2,5,4),1]  #reordering variables to be consistent across plots
   ses  <- summary(fit)$coefficients[c(1,3,2,5,4),2]
@@ -140,10 +134,6 @@ plotlm <- function(fit,add=FALSE,ylims,labs){
   #axis(side=1,at=1:n,labels=row.names(summary(fit)$coefficients),las=2)
   axis(side=1,at=1:n,labels=labs,las=2)
 }
-
-
-
-
 
 pdf('plots/lm_effects.pdf',height=3.75,width=7)
 par(mfrow=c(1,2),mar=c(2,2,2,0),oma=c(4,4,2,2),cex.axis=0.8)
@@ -165,10 +155,9 @@ mtext(expression(italic('b) E'['k'])~'['*mu*'mol quanta m'^{-2}~'s'^{-1}*']'),ad
 dev.off()
 
 
-##################################################
-## PBmax vs. Ek ##################################
-##################################################
-
+######################################################
+## RAW PBmax vs. Ek ##################################
+######################################################
 pdf('plots/PBmax_vs_Ek.pdf',height=5,width=6)
 rsqs <- numeric(5)
 par(mfrow=c(1,1))
