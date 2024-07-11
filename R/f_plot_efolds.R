@@ -1,3 +1,4 @@
+##--function to compute e-folding timescale---###
 efold <- function(alpha){
   t    <- seq(0,60,0.001)
   cors <- alpha^t
