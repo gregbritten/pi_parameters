@@ -35,22 +35,24 @@ dev.off()
 #############################################
 cols <- turbo(5)
 
+factor <- 1E6/(86400)
+
 pdf('plots/partial_effects.pdf',height=4,width=8)
-par(mfrow=c(2,4),mar=c(0.5,0.5,0.5,0.5),oma=c(4,5,3,3))
+par(mfrow=c(2,4),mar=c(0.5,0.5,0.5,0.5),oma=c(4,5,3,3),cex.lab=1,cex.axis=1)
 
 ##--PBmax--###########################
 ##par
-plot(-999,xlim=c(0,80),ylim=c(2,5),xlab='',ylab='',xaxt='n'); axis(side=1,labels=FALSE); axis(side=2,labels=FALSE)
+plot(-999,xlim=c(0,80)*factor,ylim=c(2,5),xlab='',ylab='',xaxt='n',yaxt='n'); axis(side=1,labels=FALSE); axis(side=2,labels=FALSE)
 for(i in 1:length(regions)){
   xx <- partialPlot(FITS[["reg"]][['PBmax']][[34]],x.var='par',pred.data=d %>% filter(region==regions[i]),plot=FALSE)
-  lines(xx$x,xx$y,col=cols[i])
+  lines(xx$x*factor,xx$y,col=cols[i])
 }
 mtext(side=2,expression(italic('P'['max']^'B')~'[mg C (mg chla)'^{-1}~'h'^{-1}*']'),line=2.5,cex=0.75)
 mtext('a)',adj=0.05,line=-1.5)
 legend('topright',legend=region_long,lty=1,col=cols,bty='n',cex=0.8)
 
 ##sst
-plot(-999,xlim=c(-2,30),ylim=c(2,5),xlab='',ylab='',yaxt='n',xaxt='n'); axis(side=2,labels=FALSE)
+plot(-999,xlim=c(-2,30),ylim=c(2,5),xlab='',ylab='',yaxt='n',xaxt='n'); axis(side=2,labels=FALSE); axis(side=1,labels=FALSE)
 for(i in 1:length(regions)){
   xx <- partialPlot(FITS[["reg"]][["PBmax"]][[34]],x.var='sst',pred.data=d %>% filter(region==regions[i]),plot=FALSE)
   lines(xx$x,xx$y,col=cols[i])
@@ -58,7 +60,7 @@ for(i in 1:length(regions)){
 mtext('b)',adj=0.05,line=-1.5)
 
 ##pico
-plot(-999,xlim=c(0,0.8),ylim=c(2,5),xlab='',ylab='',yaxt='n',xaxt='n'); axis(side=2,labels=FALSE)
+plot(-999,xlim=c(0,0.8),ylim=c(2,5),xlab='',ylab='',yaxt='n',xaxt='n'); axis(side=2,labels=FALSE); axis(side=1,labels=FALSE)
 for(i in 1:length(regions)){
   xx <- partialPlot(FITS[["reg"]][["PBmax"]][[34]],x.var='pico',pred.data=d %>% filter(region==regions[i]),plot=FALSE)
   lines(xx$x,xx$y,col=cols[i])
@@ -66,7 +68,7 @@ for(i in 1:length(regions)){
 mtext('c)',adj=0.05,line=-1.5)
 
 ##depth
-plot(-999,xlim=c(0,40),ylim=c(2,5),xlab='',ylab='',yaxt='n',xaxt='n'); axis(side=2,labels=FALSE)
+plot(-999,xlim=c(0,40),ylim=c(2,5),xlab='',ylab='',yaxt='n',xaxt='n'); axis(side=2,labels=FALSE); axis(side=1,labels=FALSE)
 for(i in 1:length(regions)){
   xx <- partialPlot(FITS[["reg"]][["PBmax"]][[34]],x.var='depth',pred.data=d %>% filter(region==regions[i]),plot=FALSE)
   lines(xx$x,xx$y,col=cols[i])
@@ -75,13 +77,13 @@ mtext('d)',adj=0.05,line=-1.5)
 
 ##--Ek--######################
 ##par
-plot(-999,xlim=c(0,80),ylim=c(0,200),xlab='',ylab='',xaxt='n'); axis(side=1)
+plot(-999,xlim=c(0,80)*factor,ylim=c(0,200),xlab='',ylab='',xaxt='n'); axis(side=1)
 for(i in 1:length(regions)){
   xx <- partialPlot(FITS[["reg"]][["Ek"]][[24]],x.var='par',pred.data=d %>% filter(region==regions[i]),plot=FALSE)
-  lines(xx$x,xx$y,col=cols[i])
+  lines(xx$x*factor,xx$y,col=cols[i])
 }
-mtext(side=2,expression(italic('E'['k'])~'['*mu*'mol quanta m'^{-2}~'s'^{-1}*']'),line=2.5,cex=0.75)
-mtext(side=1,expression(italic('PAR')~'[E/m'^2*'/d]'),line=2.75)
+mtext(side=2,expression(italic('E'['k'])~'['*mu*'E m'^{-2}~'s'^{-1}*']'),line=2.5,cex=0.75)
+mtext(side=1,expression(italic('PAR')~'['*mu*'E m'^{-2}~'s'^{-1}*']'),line=2.75)
 mtext('e)',adj=0.05,line=-1.5)
 
 ##sst
@@ -112,7 +114,6 @@ mtext(side=1,expression(italic('Depth')~'[m]'),line=2.75)
 mtext('h)',adj=0.05,line=-1.5)
 
 dev.off()
-
 
 ####################################################
 ## MIXED EFFECTS REGRESSION EFFECTS ################
