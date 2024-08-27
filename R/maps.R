@@ -1,6 +1,8 @@
 library(maps)
 library(viridis)
 
+FITS <- readRDS('results/FITS.rds')
+
 ##--construct climatologies using timescale that maximizes predictability--#######
 day_Ek    <- 34
 day_PBmax <- 24
