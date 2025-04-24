@@ -1,7 +1,12 @@
 library(maps)
 library(viridis)
+library(here)
 
 FITS <- readRDS('results/FITS.rds')
+
+sst <- readRDS('processed_data/sst.rds')
+par <- readRDS('processed_data/par.rds')
+chl <- readRDS('processed_data/chl.rds')
 
 ##--construct climatologies using timescale that maximizes predictability--#######
 day_Ek    <- 34

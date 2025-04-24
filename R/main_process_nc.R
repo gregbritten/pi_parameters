@@ -64,6 +64,7 @@ write.csv(file='dat.csv',dat,row.names=FALSE)
 
 
 for(i in 2:365){
+print(i)
   sst=colMeans(sstnc[1:i,],na.rm=TRUE)
   chl=colMeans(chlnc[1:i,],na.rm=TRUE)
   par=colMeans(parnc[1:i,],na.rm=TRUE)
