@@ -22,7 +22,7 @@ brewin <- function(G, H, J, K, C, SST){
 
 pico <- function(G,H,J,K,C,SST){
   bb <- brewin(G,H,J,K,C,SST)
-  return(max(bb[1],0)/C)
+  return(max(bb[1],0,na.rm=TRUE)/C)
 }
 
 nano_pico <- function(G,H,J,K,C,SST){
@@ -37,7 +37,7 @@ micro_nano <- function(G,H,J,K,C,SST){
 
 micro_pico <- function(G,H,J,K,C,SST){
   bb <- brewin(G,H,J,K,C,SST)
-  max(bb[3],0)/max(bb[1],0)
+  max(bb[3],0,na.rm=TRUE)/max(bb[1],0,na.rm=TRUE)
 }
 
 

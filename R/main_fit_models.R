@@ -7,7 +7,7 @@ FITS=RSQ <- list()
 
 for(i in 1:ndays){
   print(i)
-  d <- D_nc[[i]] %>% filter(complete.cases(sst,par,depth,pico,region),depth<=40)
+  d <- D_nc[[i]] %>% filter(complete.cases(sst,par,depth,pico,region),depth<=mld)
   
   fit_g_Ek    <- randomForest(Ek    ~ sst + par + depth + pico + region, data=d, importance=TRUE) 
   fit_g_PBmax <- randomForest(PBmax ~ sst + par + depth + pico + region, data=d, importance=TRUE) 
@@ -31,7 +31,7 @@ for(i in 1:ndays){
   RSQ[["noreg"]][["PBmax"]][[i]]  <- cor(fit_g_PBmax_noreg$predicted,d$PBmax)^2
   RSQ[["noreg"]][["alpha"]][[i]]  <- cor(fit_g_alpha_noreg$predicted,d$alpha)^2
   
-  dd <- D_nc[[i]] %>% filter(complete.cases(sst,par,depth,pico),depth<=40)
+  dd <- D_nc[[i]] %>% filter(complete.cases(sst,par,depth,pico),depth<=mld)
   
   fit_g_Ek_noreg_dd    <- randomForest(Ek    ~ sst + par + depth + pico, data=dd, importance=TRUE) 
   fit_g_PBmax_noreg_dd <- randomForest(PBmax ~ sst + par + depth + pico, data=dd, importance=TRUE) 
@@ -44,9 +44,10 @@ for(i in 1:ndays){
   RSQ[["noreg_dd"]][["PBmax"]][[i]]  <- cor(fit_g_PBmax_noreg_dd$predicted,dd$PBmax)^2
   RSQ[["noreg_dd"]][["alpha"]][[i]]  <- cor(fit_g_alpha_noreg_dd$predicted,dd$alpha)^2
   
-  fit_g_Ek_lm    <- lmer(scale(Ek)    ~ scale(sst) + scale(par) + scale(depth) + scale(pico) + (1|region), data=d) 
-  fit_g_PBmax_lm <- lmer(scale(PBmax) ~ scale(sst) + scale(par) + scale(depth) + scale(pico) + (1|region), data=d) 
-  fit_g_alpha_lm <- lmer(scale(alpha) ~ scale(sst) + scale(par) + scale(depth) + scale(pico) + (1|region), data=d) 
+  d <- D_nc[[i]] %>% filter(complete.cases(sst,par,depth,pico,region),depth<=40)
+  fit_g_Ek_lm    <- lmer(Ek    ~ sst + par + depth + pico + (1|region), data=d) 
+  fit_g_PBmax_lm <- lmer(PBmax ~ sst + par + depth + pico + (1|region), data=d) 
+  fit_g_alpha_lm <- lmer(alpha ~ sst + par + depth + pico + (1|region), data=d) 
   
   FITS[["lm"]][["Ek"]][[i]]    <- fit_g_Ek_lm
   FITS[["lm"]][["PBmax"]][[i]] <- fit_g_PBmax_lm
