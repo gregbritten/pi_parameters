@@ -82,10 +82,23 @@ D_nc[[1]] <- data.frame(sst=sstnc[1,],
                         mld=mld)
 
 ##--print dataset for comparison--######################
-dat <- D_nc[[1]] %>% 
+dat <- D_nc[[30]] %>% 
   mutate(date=as.Date(date,origin="1998-03-20")) %>%
   filter(region %in% regions)
 write.csv(file='dat.csv',dat,row.names=FALSE)
+
+##--meta data table--#################
+meta <- dat %>% 
+  group_by(region) %>% 
+    summarize(ndat=n(),
+              date_min=min(date),
+              date_max=max(date),
+              mean_PBmax=mean(PBmax),
+              sd_PBmax=sd(PBmax),
+              mean_Ek=mean(Ek),
+              sd_Ek=sd(Ek)
+)
+write.csv(file='metadata.csv',meta,row.names=FALSE)
 
 
 for(i in 2:365){
